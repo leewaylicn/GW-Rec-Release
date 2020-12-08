@@ -1,0 +1,1 @@
+{"family": "mytaskdefinition", "networkMode": "awsvpc", "containerDefinitions": [{"name": "airflow_analyze", "image": "856419311962.dkr.ecr.cn-north-1.amazonaws.com.cn/airflow_analyze:latest"}], "requiresCompatibilities": ["FARGATE"], "cpu": "1024", "memory": "8192"}

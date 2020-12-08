@@ -1,0 +1,4 @@
+-e .
+pytest
+aws-cdk.aws_apigateway==1.69.0
+aws-cdk.aws_dynamodb==1.69.0

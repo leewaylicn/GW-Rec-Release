@@ -1,0 +1,13 @@
+{
+"family": "mytaskdefinition",
+"networkMode": "awsvpc",
+"containerDefinitions": [{
+  "name": "myappv1",
+  "image": "httpd:2.4"
+}],
+"requiresCompatibilities": [
+  "FARGATE"
+],
+"cpu": "256",
+"memory": "512"
+}

@@ -1,0 +1,4 @@
+fastHan
+marisa_trie
+dgl==0.4.3.post2
+-e git+http://git@github.com/xiaotinghe/dgl-ke.git#egg=dglke&subdirectory=python
