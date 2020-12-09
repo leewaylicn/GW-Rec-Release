@@ -51,7 +51,7 @@ class GWGraphStack(core.Stack):
         cfg_dict['function'] = 'graph_inference'
         cfg_dict['ecr'] = 'sagemaker-recsys-graph-inference'
         cfg_dict['ecs_role'] = GWAppHelper.create_ecs_role(self)
-        #self.graph_inference_dns = self.create_fagate_NLB_autoscaling_custom(vpc, **cfg_dict)
+        self.graph_inference_dns = self.create_fagate_NLB_autoscaling_custom(vpc, **cfg_dict)
         #cfg_dict = {}
         #cfg_dict['function'] = 'graph_inference'
         #cfg_dict['ecr'] = 'sagemaker-recsys-graph-inference'
@@ -225,7 +225,7 @@ class GWGraphStack(core.Stack):
             container_name,
             image=ecs.ContainerImage.from_ecr_repository(ecr_repo), 
             logging=ecs_log,
-            environment={'KG_PATH':"s3://autorec"}
+            environment={'KG_PATH':"s3://autorec-1"}
         )
         # 2. config port mapping
         port_mapping = ecs.PortMapping(
