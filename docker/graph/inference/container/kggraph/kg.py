@@ -4,7 +4,7 @@ import numpy as np
 import os
 from dglke import train as dglke_train
 s3client = boto3.client('s3')
-Bucket = 'autorec'
+Bucket = 'autorec-1'
 class Kg:
     def __init__(self, kg_folder=None):
         self.entity_to_idx = {} # 记录全部实体（通用+行业）

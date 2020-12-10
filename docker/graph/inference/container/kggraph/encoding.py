@@ -7,7 +7,7 @@ print("sys path is {}".format(sys.path))
 from fastHan import FastHan
 import marisa_trie
 s3client = boto3.client('s3')
-Bucket = 'autorec'
+Bucket = 'autorec-1'
 
 class Vocab:
     def __init__(self, vocab_file = None):

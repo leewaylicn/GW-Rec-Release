@@ -33,7 +33,7 @@ class GWEcsHelper:
 
         return ecs_role 
 
-    def create_fagate_ALB_autoscaling(stack, vpc, image, name, ecs_role=None, env=None, port=None):
+    def create_fagate_ALB_autoscaling(stack, vpc, image, name, ecs_role=None, env=None, port=None, public_load_balancer=False):
         cluster = ecs.Cluster(
             stack, 
             name+'fargate-service-autoscaling', 
@@ -92,6 +92,7 @@ class GWEcsHelper:
                 cluster=cluster,
                 task_definition=task,
                 assign_public_ip=True,
+                public_load_balancer=public_load_balancer,
                 listener_port=port
             )
         else:
@@ -100,6 +101,7 @@ class GWEcsHelper:
                 name+"-Service",
                 cluster=cluster,
                 task_definition=task,
+                public_load_balancer=public_load_balancer,
                 assign_public_ip=True
             )
 

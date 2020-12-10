@@ -10,6 +10,8 @@ from deploy.gw_inferhandler_stack import GWInferHandlerStack
 from deploy.gw_sample_stack import GWSampleStack
 from deploy.gw_loginto_stack import GWLogintoStack
 
+from deploy.gw_infra_stack_test import CdkInfraStackTest
+
 # from deploy.gw_trainhandler_stack import GWTrainHandlerStack
 
 
@@ -22,13 +24,14 @@ app = core.App()
 #GWGraphStack(app, "gw-graph-stack")
 # GWTrainHandlerStack(app, "gw-train-stack")
 
+# infra_stack = CdkInfraStackTest(
+#                 app, 
+#                 "cdk-stack-infer-infra-test"
+#             )
+
 infra_stack = CdkInfraStack(
                 app, 
                 "cdk-stack-infer-infra"
-                # env={
-                #     "region": "cn-northwest-1", 
-                #     "account": "233121040379"
-                # }
             )
 
 sample_stack = GWSampleStack(
@@ -48,7 +51,7 @@ dkn_stack = GWDknStack(
 graph_stack = GWGraphStack(
                 app, 
                 "cdk-stack-infer-graph", 
-                #infra_stack.vpc
+                infra_stack.vpc
                 #ecs_role = infra_stack.ecs_role
             )
 

@@ -17,10 +17,10 @@ import json
 
 class GWGraphStack(core.Stack):
 
-    def __init__(self, scope: core.Construct, id: str, **kwargs) -> None:
+    def __init__(self, scope: core.Construct, id: str, vpc: ec2.Vpc, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
-        vpc = ec2.Vpc(self, "GWVpc", max_azs=3)     # default is all AZs in region
+       # vpc = ec2.Vpc(self, "GWVpc", max_azs=3)     # default is all AZs in region
 
         lambda_train_role = GWAppHelper.create_lambda_train_role(self)
         sagemaker_train_role = GWAppHelper.create_sagemaker_train_role(self)
@@ -39,7 +39,7 @@ class GWGraphStack(core.Stack):
         cfg_dict['lambda_role'] = lambda_train_role
         cfg_dict['sagemaker_role'] = sagemaker_train_role
         
-        # self.graph_train = GWAppHelper.create_trigger_training_task(self, **cfg_dict)
+        self.graph_train = GWAppHelper.create_trigger_training_task(self, **cfg_dict)
 
         ## Create Redis
         #self.create_redis(vpc)

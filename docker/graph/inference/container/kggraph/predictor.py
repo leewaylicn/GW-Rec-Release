@@ -27,7 +27,7 @@ kg_path = os.environ['KG_PATH']
 class ScoringService(object):
     import kg
     import encoding
-    graph = kg.Kg('kg', kg_folder=kg_path) # Where we keep the model when it's loaded
+    graph = kg.Kg(kg_folder=kg_path) # Where we keep the model when it's loaded
     model = encoding.encoding(graph)
 
     @classmethod
