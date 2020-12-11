@@ -225,7 +225,9 @@ class GWGraphStack(core.Stack):
             container_name,
             image=ecs.ContainerImage.from_ecr_repository(ecr_repo), 
             logging=ecs_log,
-            environment={'KG_PATH':"s3://autorec-1"}
+            environment={'KG_PATH':"s3://autorec-1",
+            'INPUT_BUCKET_NAME':"s3://autorec-1/input_graph/",
+            'OUTPUT_BUCKET_NAME':"s3://autorec-1/output_graph/"}
         )
         # 2. config port mapping
         port_mapping = ecs.PortMapping(

@@ -17,6 +17,8 @@ prefix = '/opt/ml/'
 model_path = os.path.join(prefix, 'model')
 
 kg_path = os.environ['KG_PATH']
+input_bucket_name = os.environ['INPUT_BUCKET_NAME']
+output_bucket_name = os.environ['OUTPUT_BUCKET_NAME']
 
 # graph = kg.Kg('kg')
 # model = encoding.encoding(graph)
@@ -27,8 +29,8 @@ kg_path = os.environ['KG_PATH']
 class ScoringService(object):
     import kg
     import encoding
-    graph = kg.Kg(kg_folder=kg_path) # Where we keep the model when it's loaded
-    model = encoding.encoding(graph)
+    graph = kg.Kg(kg_path, input_bucket_name, output_bucket_name) # Where we keep the model when it's loaded
+    model = encoding.encoding(graph,input_bucket_name)
 
     @classmethod
     def get_model(cls):

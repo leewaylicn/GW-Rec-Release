@@ -12,9 +12,6 @@ import shutil
 import glob
 from datetime import date, timedelta
 
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
 from tempfile import TemporaryDirectory
 
 #################### CMD Arguments ####################
@@ -23,7 +20,7 @@ FLAGS = tf.app.flags.FLAGS
 # model param
 tf.app.flags.DEFINE_boolean(
     "transform", True, "whether to transform entity embeddings")
-tf.app.flags.DEFINE_boolean("use_context", True,
+tf.app.flags.DEFINE_boolean("use_context", False,
                             "whether to transform context embeddings")
 tf.app.flags.DEFINE_boolean("use_entity", True,
                             "whether to transform entity embeddings")
@@ -137,28 +134,38 @@ class DKN(object):
             # entity_embs = np.load(os.path.join(
             #     raw_dir, 'entity_embeddings.npy'))
             self.word_embeddings = tf.Variable(
-                word_embs, dtype=np.float32, name='word')
+                word_embs, trainable=False, dtype=np.float32, name='word')
+#             self.word_embeddings = word_embs
             self.entity_embeddings = tf.Variable(
-                entity_embs, dtype=np.float32, name='entity')
-            self.reg_params.append(self.word_embeddings)
-            self.reg_params.append(self.entity_embeddings)
+                entity_embs, trainable=False, dtype=np.float32, name='entity')
+#             self.entity_embeddings = entity_embs
+#             self.reg_params.append(self.word_embeddings)
+#             self.reg_params.append(self.entity_embeddings)
+#             print("run here 1!")
+#             print(params["use_context"])
 
             if params["use_context"]:
+#                 print("run here 2.1!")
                 context_embs = np.load(os.path.join(raw_dir,'context_embeddings_' +
                                       params["KGE"] + '_' + str(params["entity_dim"]) + '.npy'))
                 self.context_embeddings = tf.Variable(
                     context_embs, dtype=np.float32, name='context')
-                self.reg_params.append(self.context_embeddings)
+#                 self.reg_params.append(self.context_embeddings)
+#                 print("run here 2.2!")
 
             if params["transform"]:
+#                 print("run here 3.1!")
                 self.entity_embeddings = tf.layers.dense(
                     self.entity_embeddings, units=params["entity_dim"], activation=tf.nn.tanh, name='transformed_entity',
                     kernel_regularizer=tf.contrib.layers.l2_regularizer(params["l2_weight"]))
+#                 print("run here 3.2!")
                 if params["use_context"]:
                     self.context_embeddings = tf.layers.dense(
                         self.context_embeddings, units=params["entity_dim"], activation=tf.nn.tanh,
                         name='transformed_context', kernel_regularizer=tf.contrib.layers.l2_regularizer(params["l2_weight"]))
+#         print("build graph")
         self.logit = tf.reshape(self._build_graph(), [-1])
+#         print("build output")
         self.output = tf.sigmoid(self.logit)
 
     def _build_graph(self):
@@ -167,6 +174,7 @@ class DKN(object):
         self.keep_prob_train = 1 - np.array(params["dropout"])
         self.keep_prob_test = np.ones_like(params["dropout"])
         with tf.compat.v1.variable_scope("DKN") as scope:
+            print("build dkn")
             logit = self._build_dkn()
             return logit
 
@@ -228,8 +236,8 @@ class DKN(object):
                 hidden_nn_layers.append(curr_hidden_nn_layer)
                 layer_idx += 1
                 last_layer_size = layer_size
-                self.layer_params.append(curr_w_nn_layer)
-                self.layer_params.append(curr_b_nn_layer)
+#                 self.layer_params.append(curr_w_nn_layer)
+#                 self.layer_params.append(curr_b_nn_layer)
 
             w_nn_output = tf.compat.v1.get_variable(
                 name="w_nn_output", shape=[last_layer_size, 1], dtype=tf.float32
@@ -237,8 +245,8 @@ class DKN(object):
             b_nn_output = tf.compat.v1.get_variable(
                 name="b_nn_output", shape=[1], dtype=tf.float32
             )
-            self.layer_params.append(w_nn_output)
-            self.layer_params.append(b_nn_output)
+#             self.layer_params.append(w_nn_output)
+#             self.layer_params.append(b_nn_output)
             nn_output = tf.compat.v1.nn.xw_plus_b(
                 hidden_nn_layers[-1], w_nn_output, b_nn_output
             )
@@ -347,14 +355,14 @@ class DKN(object):
                     axis=1,
                     keepdims=True,
                 )
-                if attention_w not in self.layer_params:
-                    self.layer_params.append(attention_w)
-                if attention_b not in self.layer_params:
-                    self.layer_params.append(attention_b)
-                if attention_output_w not in self.layer_params:
-                    self.layer_params.append(attention_output_w)
-                if attention_output_b not in self.layer_params:
-                    self.layer_params.append(attention_output_b)
+#                 if attention_w not in self.layer_params:
+#                     self.layer_params.append(attention_w)
+#                 if attention_b not in self.layer_params:
+#                     self.layer_params.append(attention_b)
+#                 if attention_output_w not in self.layer_params:
+#                     self.layer_params.append(attention_output_w)
+#                 if attention_output_b not in self.layer_params:
+#                     self.layer_params.append(attention_output_b)
             self.news_field_embed_final_batch = tf.squeeze(news_field_embed)
             click_field_embed_final_batch = tf.squeeze(click_field_embed_final)
 
@@ -377,6 +385,7 @@ class DKN(object):
 
         dim = params["word_dim"]
         embedded_chars = tf.nn.embedding_lookup(self.word_embeddings, word)
+        print(embedded_chars)
         if params["use_entity"] and params["use_context"]:
             entity_embedded_chars = tf.nn.embedding_lookup(
                 self.entity_embeddings, entity
@@ -391,6 +400,7 @@ class DKN(object):
             entity_embedded_chars = tf.nn.embedding_lookup(
                 self.entity_embeddings, entity
             )
+            print(entity_embedded_chars)
             concat = tf.concat([embedded_chars, entity_embedded_chars], axis=-1)
         else:
             concat = embedded_chars
@@ -420,10 +430,10 @@ class DKN(object):
                     shape=[num_filters],
                     dtype=tf.float32,
                 )
-                if W not in self.layer_params:
-                    self.layer_params.append(W)
-                if b not in self.layer_params:
-                    self.layer_params.append(b)
+#                 if W not in self.layer_params:
+#                     self.layer_params.append(W)
+#                 if b not in self.layer_params:
+#                     self.layer_params.append(b)
                 conv = tf.nn.conv2d(
                     concat_expanded,
                     W,
@@ -502,18 +512,18 @@ class DKN(object):
             )
             self.l2_loss = tf.Variable(tf.constant(
                 0., dtype=tf.float32), trainable=False)
-            for param in self.reg_params:
-                self.l2_loss = tf.add(
-                    self.l2_loss, params["l2_weight"] * tf.nn.l2_loss(param))
+#             for param in self.reg_params:
+#                 self.l2_loss = tf.add(
+#                     self.l2_loss, params["l2_weight"] * tf.nn.l2_loss(param))
             if params["transform"]:
                 self.l2_loss = tf.add(
                     self.l2_loss, tf.compat.v1.losses.get_regularization_loss())
             # self.loss = self.base_loss + self.l2_loss
             # self.loss = self.base_loss
-            self.embed_regular_loss = tf.add_n(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
+#             self.embed_regular_loss = tf.add_n(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
             self.regular_loss = self._l2_loss() + self._l1_loss() + self._cross_l_loss()
             self.loss = tf.add(self.base_loss, self.regular_loss)
-            self.loss = tf.add(self.loss, self.embed_regular_loss)
+#             self.loss = tf.add(self.loss, self.embed_regular_loss)
             self.optimizer = tf.compat.v1.train.AdamOptimizer(
                 FLAGS.learning_rate).minimize(self.loss)
 
@@ -627,11 +637,13 @@ def model_fn(features, labels, mode, params):
             export_outputs=export_outputs)
 
     # ------bulid loss------
+    print("build train")
     dkn_model._build_train(params)
     loss = dkn_model.loss
+    print("build loss")
     # Provide an estimator spec for `ModeKeys.EVAL`
-    eval_logging_hook = tf.estimator.LoggingTensorHook(
-        {'eval_labels': labels, 'eval_pred': pred, 'eval_loss':loss}, every_n_iter=1)
+#     eval_logging_hook = tf.estimator.LoggingTensorHook(
+#         {'eval_labels': labels, 'eval_pred': pred, 'eval_loss':loss}, every_n_iter=1)
     # eval_metric_ops = {
     #     "auc": tf.metrics.auc(labels, pred)
     # }
@@ -655,8 +667,10 @@ def model_fn(features, labels, mode, params):
         loss, global_step=tf.train.get_or_create_global_step())
 
     # Provide an estimator spec for `ModeKeys.TRAIN` modes
-    train_logging_hook = tf.estimator.LoggingTensorHook(
-        {'train_labels': labels, 'train_pred': pred, 'train_loss':loss}, every_n_iter=1)
+#     train_logging_hook = tf.estimator.LoggingTensorHook(
+#         {'train_labels': labels, 'train_pred': pred, 'train_loss':loss}, every_n_iter=1)
+    
+    print("build train")
     if mode == tf.estimator.ModeKeys.TRAIN:
         return tf.estimator.EstimatorSpec(
             mode=mode,
@@ -686,6 +700,7 @@ def main(_):
     print('embed_l2 ', FLAGS.embed_l2)
     print('layer_l2 ', FLAGS.layer_l2)
     print('shuffle ', FLAGS.perform_shuffle)
+    print('use_context ', FLAGS.use_context)
 
     # check train/test path
     if FLAGS.data_dir == '':
@@ -714,9 +729,9 @@ def main(_):
             print("existing model cleaned at %s" % FLAGS.model_dir)
 
     model_params = {
-        "transform": FLAGS.transform,
+        "transform": False,
         "use_entity": FLAGS.use_entity,
-        "use_context": FLAGS.use_context,
+        "use_context": False,
         "max_click_history": FLAGS.max_click_history,
         "n_filters": FLAGS.n_filters,
         "filter_sizes": FLAGS.filter_sizes,
@@ -753,6 +768,7 @@ def main(_):
         """
         i = 1
         for _ in range(FLAGS.num_epochs):
+            print("start train")
             train_result = dkn_estimator.train(input_fn=lambda: input_fn(
                 tr_files, num_epochs=1, batch_size=FLAGS.batch_size, perform_shuffle=FLAGS.perform_shuffle))
             print("finish train, start eval")
@@ -788,5 +804,6 @@ def main(_):
         print("finish saving model!")
 
 if __name__ == "__main__":
-    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
+
     tf.compat.v1.app.run()

@@ -7,10 +7,10 @@ print("sys path is {}".format(sys.path))
 from fastHan import FastHan
 import marisa_trie
 s3client = boto3.client('s3')
-Bucket = 'autorec-1'
+# Bucket = 'autorec-1'
 
 class Vocab:
-    def __init__(self, vocab_file = None):
+    def __init__(self, Bucket, vocab_file = None):
         self.token_to_idx = {}
         if vocab_file == None:
             s3client.download_file(Bucket, 'vocab.json', 'vocab.json')
@@ -33,10 +33,12 @@ class Vocab:
         return [self.idx_to_token[index] for index in indices]
     
 class encoding:
-    def __init__(self, kg):
+    def __init__(self, kg, input_bucket, output_bucket=None):
         self.kg = kg
+        self.input_bucket = input_bucket
+        self.output_bucket = output_bucket
         self.trie = marisa_trie.Trie(list(kg.entity_industry))
-        self.vocab = Vocab()
+        self.vocab = Vocab(self.input_bucket)
         self.model=FastHan()
     def __getitem__(self, text):
         seg, ner_gen, ner_indu = self.word_parser(text)
@@ -49,7 +51,10 @@ class encoding:
         for word in seg:
             word_pos.append(len(word) + word_pos[-1])
         for n in ner_pre:
-            for j in re.finditer(str(n), ''.join(seg)):
+            n = str(n).replace('*','\*')
+            #print(n)
+#             for j in re.finditer('%r'%n, ''.join(seg)):
+            for j in self.finditer('%r'%n, ''.join(seg)):
                 start, end = None, None
                 for i in range(len(word_pos)-1):
                     if j.span()[0] == word_pos[i]:
@@ -60,6 +65,25 @@ class encoding:
                     ner_gen.append((start, end))
         ner_indu = self.get_industry_entities(seg)
         return seg, ner_gen, ner_indu
+    # def word_parser(self, text):
+    #     seg = [str(word).strip() for word in self.model(text)[0] if len(str(word).strip())!=0]
+    #     ner_pre = self.model(text, target="NER")[0]
+    #     ner_gen = []
+    #     word_pos = [0]
+    #     for word in seg:
+    #         word_pos.append(len(word) + word_pos[-1])
+    #     for n in ner_pre:
+    #         for j in re.finditer(str(n), ''.join(seg)):
+    #             start, end = None, None
+    #             for i in range(len(word_pos)-1):
+    #                 if j.span()[0] == word_pos[i]:
+    #                     start = i
+    #                 if j.span()[1] == word_pos[i+1]:
+    #                     end = i+1
+    #             if start!=None and end != None:
+    #                 ner_gen.append((start, end))
+    #     ner_indu = self.get_industry_entities(seg)
+    #     return seg, ner_gen, ner_indu
     def get_industry_entities(self, sentence):
         entities = []
         i = 0

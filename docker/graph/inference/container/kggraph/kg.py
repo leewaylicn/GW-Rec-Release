@@ -4,9 +4,9 @@ import numpy as np
 import os
 from dglke import train as dglke_train
 s3client = boto3.client('s3')
-Bucket = 'autorec-1'
+# Bucket = 'autorec-1'
 class Kg:
-    def __init__(self, kg_folder=None):
+    def __init__(self, kg_folder=None, input_bucket=None, output_bucket=None):
         self.entity_to_idx = {} # 记录全部实体（通用+行业）
         self.idx_to_entity = []
         self.relation_to_idx = {}
@@ -14,33 +14,60 @@ class Kg:
         self.entity_industry = set() # 记录行业实体
         self.p = []
         self.kg_folder = kg_folder
+        self.input_bucket = input_bucket
+        self.output_bucket = output_bucket
         if kg_folder != None:
-            self.load_file(kg_folder)
-    def load_file(self, kg_folder):
-        # 加载实体列表
-        if not os.path.exists(kg_folder):
-            os.makedirs(kg_folder)
-        if not os.path.exists(kg_folder + '/kg_dbpedia.txt'):
-            s3client.download_file(Bucket, 'kg_dbpedia.txt', kg_folder + '/kg_dbpedia.txt')
-        if not os.path.exists(kg_folder + '/entities_dbpedia.dict'):
-            s3client.download_file(Bucket, 'entities_dbpedia.dict', kg_folder + '/entities_dbpedia.dict')
-        entities = pd.read_csv(kg_folder + '/entities_dbpedia.dict', header=None)
-        for r in zip(entities[0], entities[1]):
-            self.entity_to_idx[r[1]] = r[0]
-            self.idx_to_entity.append(r[1])
-        # 加载关系三元组
-        if not os.path.exists(kg_folder + '/relations_dbpedia.dict'):
-            s3client.download_file(Bucket, 'relations_dbpedia.dict', kg_folder + '/relations_dbpedia.dict')
-        relations = pd.read_csv(kg_folder + '/relations_dbpedia.dict', header=None)
-        for r in zip(relations[0], relations[1]):
-            self.relation_to_idx[r[1]] = r[0]
-            self.idx_to_relation.append(r[1])
-        # 加载行业专属实体列表
-        if not os.path.exists(kg_folder + '/entity_industry.txt'):
-            s3client.download_file(Bucket, 'entity_industry.txt', kg_folder + '/entity_industry.txt')
-        with open(kg_folder + '/entity_industry.txt', 'r') as f:
-            for word in f:
-                self.entity_industry.add(word.strip())
+            self.load_file(kg_folder, self.input_bucket)
+    def load_file(self, kg_folder, Bucket):
+            # 加载实体列表
+            if not os.path.exists(kg_folder):
+                os.makedirs(kg_folder)
+            if not os.path.exists(kg_folder + '/kg_dbpedia.txt'):
+                s3client.download_file(Bucket, 'kg_dbpedia.txt', kg_folder + '/kg_dbpedia.txt')
+            if not os.path.exists(kg_folder + '/entities_dbpedia.dict'):
+                s3client.download_file(Bucket, 'entities_dbpedia.dict', kg_folder + '/entities_dbpedia.dict')
+            entities = pd.read_csv(kg_folder + '/entities_dbpedia.dict', header=None)
+            for r in zip(entities[0], entities[1]):
+                self.entity_to_idx[str(r[1]).strip()] = r[0]
+                self.idx_to_entity.append(str(r[1]).strip())
+            # 加载关系三元组
+            if not os.path.exists(kg_folder + '/relations_dbpedia.dict'):
+                s3client.download_file(Bucket, 'relations_dbpedia.dict', kg_folder + '/relations_dbpedia.dict')
+            relations = pd.read_csv(kg_folder + '/relations_dbpedia.dict', header=None)
+            for r in zip(relations[0], relations[1]):
+                self.relation_to_idx[str(r[1]).strip()] = r[0]
+                self.idx_to_relation.append(str(r[1]).strip())
+            # 加载行业专属实体列表
+            if not os.path.exists(kg_folder + '/entity_industry.txt'):
+                s3client.download_file(Bucket, 'entity_industry.txt', kg_folder + '/entity_industry.txt')
+            with open(kg_folder + '/entity_industry.txt', 'r') as f:
+                for word in f:
+                    self.entity_industry.add(word.strip())                
+    # def load_file(self, kg_folder):
+    #     # 加载实体列表
+    #     if not os.path.exists(kg_folder):
+    #         os.makedirs(kg_folder)
+    #     if not os.path.exists(kg_folder + '/kg_dbpedia.txt'):
+    #         s3client.download_file(Bucket, 'kg_dbpedia.txt', kg_folder + '/kg_dbpedia.txt')
+    #     if not os.path.exists(kg_folder + '/entities_dbpedia.dict'):
+    #         s3client.download_file(Bucket, 'entities_dbpedia.dict', kg_folder + '/entities_dbpedia.dict')
+    #     entities = pd.read_csv(kg_folder + '/entities_dbpedia.dict', header=None)
+    #     for r in zip(entities[0], entities[1]):
+    #         self.entity_to_idx[r[1]] = r[0]
+    #         self.idx_to_entity.append(r[1])
+    #     # 加载关系三元组
+    #     if not os.path.exists(kg_folder + '/relations_dbpedia.dict'):
+    #         s3client.download_file(Bucket, 'relations_dbpedia.dict', kg_folder + '/relations_dbpedia.dict')
+    #     relations = pd.read_csv(kg_folder + '/relations_dbpedia.dict', header=None)
+    #     for r in zip(relations[0], relations[1]):
+    #         self.relation_to_idx[r[1]] = r[0]
+    #         self.idx_to_relation.append(r[1])
+    #     # 加载行业专属实体列表
+    #     if not os.path.exists(kg_folder + '/entity_industry.txt'):
+    #         s3client.download_file(Bucket, 'entity_industry.txt', kg_folder + '/entity_industry.txt')
+    #     with open(kg_folder + '/entity_industry.txt', 'r') as f:
+    #         for word in f:
+    #             self.entity_industry.add(word.strip())
     def add_entity(self, entity_name, industry = False):
         # 如果待加入实体不在实体列表中，则添加。如果industry为True，则同时记录为行业实体
         if entity_name not in self.entity_to_idx:
@@ -95,3 +122,5 @@ class Kg:
                   '--format','udd_hrt',
                   '--data_files','entities_dbpedia.dict','relations_dbpedia.dict','kg_dbpedia.txt',
                   '--neg_sample_size_eval','10000'])
+        if self.output_bucket != None:
+            s3client.upload_file(kg_folder + '/*.npy', self.output_bucket)
