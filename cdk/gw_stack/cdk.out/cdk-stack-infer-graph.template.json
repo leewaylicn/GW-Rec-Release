@@ -1,457 +1,5 @@
 {
   "Resources": {
-    "GWVpc58472F73": {
-      "Type": "AWS::EC2::VPC",
-      "Properties": {
-        "CidrBlock": "10.0.0.0/16",
-        "EnableDnsHostnames": true,
-        "EnableDnsSupport": true,
-        "InstanceTenancy": "default",
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "cdk-stack-infer-graph/GWVpc"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/Resource"
-      }
-    },
-    "GWVpcPublicSubnet1Subnet49EB8E88": {
-      "Type": "AWS::EC2::Subnet",
-      "Properties": {
-        "CidrBlock": "10.0.0.0/18",
-        "VpcId": {
-          "Ref": "GWVpc58472F73"
-        },
-        "AvailabilityZone": {
-          "Fn::Select": [
-            0,
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
-        "MapPublicIpOnLaunch": true,
-        "Tags": [
-          {
-            "Key": "aws-cdk:subnet-name",
-            "Value": "Public"
-          },
-          {
-            "Key": "aws-cdk:subnet-type",
-            "Value": "Public"
-          },
-          {
-            "Key": "Name",
-            "Value": "cdk-stack-infer-graph/GWVpc/PublicSubnet1"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PublicSubnet1/Subnet"
-      }
-    },
-    "GWVpcPublicSubnet1RouteTableE63551F4": {
-      "Type": "AWS::EC2::RouteTable",
-      "Properties": {
-        "VpcId": {
-          "Ref": "GWVpc58472F73"
-        },
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "cdk-stack-infer-graph/GWVpc/PublicSubnet1"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PublicSubnet1/RouteTable"
-      }
-    },
-    "GWVpcPublicSubnet1RouteTableAssociation41FA31F9": {
-      "Type": "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties": {
-        "RouteTableId": {
-          "Ref": "GWVpcPublicSubnet1RouteTableE63551F4"
-        },
-        "SubnetId": {
-          "Ref": "GWVpcPublicSubnet1Subnet49EB8E88"
-        }
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PublicSubnet1/RouteTableAssociation"
-      }
-    },
-    "GWVpcPublicSubnet1DefaultRoute76558746": {
-      "Type": "AWS::EC2::Route",
-      "Properties": {
-        "RouteTableId": {
-          "Ref": "GWVpcPublicSubnet1RouteTableE63551F4"
-        },
-        "DestinationCidrBlock": "0.0.0.0/0",
-        "GatewayId": {
-          "Ref": "GWVpcIGW0A019878"
-        }
-      },
-      "DependsOn": [
-        "GWVpcVPCGW69CA13EA"
-      ],
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PublicSubnet1/DefaultRoute"
-      }
-    },
-    "GWVpcPublicSubnet1EIPCA50B005": {
-      "Type": "AWS::EC2::EIP",
-      "Properties": {
-        "Domain": "vpc",
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "cdk-stack-infer-graph/GWVpc/PublicSubnet1"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PublicSubnet1/EIP"
-      }
-    },
-    "GWVpcPublicSubnet1NATGatewayF606BAFC": {
-      "Type": "AWS::EC2::NatGateway",
-      "Properties": {
-        "AllocationId": {
-          "Fn::GetAtt": [
-            "GWVpcPublicSubnet1EIPCA50B005",
-            "AllocationId"
-          ]
-        },
-        "SubnetId": {
-          "Ref": "GWVpcPublicSubnet1Subnet49EB8E88"
-        },
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "cdk-stack-infer-graph/GWVpc/PublicSubnet1"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PublicSubnet1/NATGateway"
-      }
-    },
-    "GWVpcPublicSubnet2Subnet1A7D037F": {
-      "Type": "AWS::EC2::Subnet",
-      "Properties": {
-        "CidrBlock": "10.0.64.0/18",
-        "VpcId": {
-          "Ref": "GWVpc58472F73"
-        },
-        "AvailabilityZone": {
-          "Fn::Select": [
-            1,
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
-        "MapPublicIpOnLaunch": true,
-        "Tags": [
-          {
-            "Key": "aws-cdk:subnet-name",
-            "Value": "Public"
-          },
-          {
-            "Key": "aws-cdk:subnet-type",
-            "Value": "Public"
-          },
-          {
-            "Key": "Name",
-            "Value": "cdk-stack-infer-graph/GWVpc/PublicSubnet2"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PublicSubnet2/Subnet"
-      }
-    },
-    "GWVpcPublicSubnet2RouteTable9CBCC6AE": {
-      "Type": "AWS::EC2::RouteTable",
-      "Properties": {
-        "VpcId": {
-          "Ref": "GWVpc58472F73"
-        },
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "cdk-stack-infer-graph/GWVpc/PublicSubnet2"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PublicSubnet2/RouteTable"
-      }
-    },
-    "GWVpcPublicSubnet2RouteTableAssociation199E05BE": {
-      "Type": "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties": {
-        "RouteTableId": {
-          "Ref": "GWVpcPublicSubnet2RouteTable9CBCC6AE"
-        },
-        "SubnetId": {
-          "Ref": "GWVpcPublicSubnet2Subnet1A7D037F"
-        }
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PublicSubnet2/RouteTableAssociation"
-      }
-    },
-    "GWVpcPublicSubnet2DefaultRoute200BE8FE": {
-      "Type": "AWS::EC2::Route",
-      "Properties": {
-        "RouteTableId": {
-          "Ref": "GWVpcPublicSubnet2RouteTable9CBCC6AE"
-        },
-        "DestinationCidrBlock": "0.0.0.0/0",
-        "GatewayId": {
-          "Ref": "GWVpcIGW0A019878"
-        }
-      },
-      "DependsOn": [
-        "GWVpcVPCGW69CA13EA"
-      ],
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PublicSubnet2/DefaultRoute"
-      }
-    },
-    "GWVpcPublicSubnet2EIP0AD6BCED": {
-      "Type": "AWS::EC2::EIP",
-      "Properties": {
-        "Domain": "vpc",
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "cdk-stack-infer-graph/GWVpc/PublicSubnet2"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PublicSubnet2/EIP"
-      }
-    },
-    "GWVpcPublicSubnet2NATGateway6931392F": {
-      "Type": "AWS::EC2::NatGateway",
-      "Properties": {
-        "AllocationId": {
-          "Fn::GetAtt": [
-            "GWVpcPublicSubnet2EIP0AD6BCED",
-            "AllocationId"
-          ]
-        },
-        "SubnetId": {
-          "Ref": "GWVpcPublicSubnet2Subnet1A7D037F"
-        },
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "cdk-stack-infer-graph/GWVpc/PublicSubnet2"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PublicSubnet2/NATGateway"
-      }
-    },
-    "GWVpcPrivateSubnet1Subnet5A9ADB27": {
-      "Type": "AWS::EC2::Subnet",
-      "Properties": {
-        "CidrBlock": "10.0.128.0/18",
-        "VpcId": {
-          "Ref": "GWVpc58472F73"
-        },
-        "AvailabilityZone": {
-          "Fn::Select": [
-            0,
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
-        "MapPublicIpOnLaunch": false,
-        "Tags": [
-          {
-            "Key": "aws-cdk:subnet-name",
-            "Value": "Private"
-          },
-          {
-            "Key": "aws-cdk:subnet-type",
-            "Value": "Private"
-          },
-          {
-            "Key": "Name",
-            "Value": "cdk-stack-infer-graph/GWVpc/PrivateSubnet1"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PrivateSubnet1/Subnet"
-      }
-    },
-    "GWVpcPrivateSubnet1RouteTableBCA0508E": {
-      "Type": "AWS::EC2::RouteTable",
-      "Properties": {
-        "VpcId": {
-          "Ref": "GWVpc58472F73"
-        },
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "cdk-stack-infer-graph/GWVpc/PrivateSubnet1"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PrivateSubnet1/RouteTable"
-      }
-    },
-    "GWVpcPrivateSubnet1RouteTableAssociation44914524": {
-      "Type": "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties": {
-        "RouteTableId": {
-          "Ref": "GWVpcPrivateSubnet1RouteTableBCA0508E"
-        },
-        "SubnetId": {
-          "Ref": "GWVpcPrivateSubnet1Subnet5A9ADB27"
-        }
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PrivateSubnet1/RouteTableAssociation"
-      }
-    },
-    "GWVpcPrivateSubnet1DefaultRoute5A8694FA": {
-      "Type": "AWS::EC2::Route",
-      "Properties": {
-        "RouteTableId": {
-          "Ref": "GWVpcPrivateSubnet1RouteTableBCA0508E"
-        },
-        "DestinationCidrBlock": "0.0.0.0/0",
-        "NatGatewayId": {
-          "Ref": "GWVpcPublicSubnet1NATGatewayF606BAFC"
-        }
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PrivateSubnet1/DefaultRoute"
-      }
-    },
-    "GWVpcPrivateSubnet2Subnet19729786": {
-      "Type": "AWS::EC2::Subnet",
-      "Properties": {
-        "CidrBlock": "10.0.192.0/18",
-        "VpcId": {
-          "Ref": "GWVpc58472F73"
-        },
-        "AvailabilityZone": {
-          "Fn::Select": [
-            1,
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
-        "MapPublicIpOnLaunch": false,
-        "Tags": [
-          {
-            "Key": "aws-cdk:subnet-name",
-            "Value": "Private"
-          },
-          {
-            "Key": "aws-cdk:subnet-type",
-            "Value": "Private"
-          },
-          {
-            "Key": "Name",
-            "Value": "cdk-stack-infer-graph/GWVpc/PrivateSubnet2"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PrivateSubnet2/Subnet"
-      }
-    },
-    "GWVpcPrivateSubnet2RouteTable6364FB63": {
-      "Type": "AWS::EC2::RouteTable",
-      "Properties": {
-        "VpcId": {
-          "Ref": "GWVpc58472F73"
-        },
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "cdk-stack-infer-graph/GWVpc/PrivateSubnet2"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PrivateSubnet2/RouteTable"
-      }
-    },
-    "GWVpcPrivateSubnet2RouteTableAssociationA4D6943A": {
-      "Type": "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties": {
-        "RouteTableId": {
-          "Ref": "GWVpcPrivateSubnet2RouteTable6364FB63"
-        },
-        "SubnetId": {
-          "Ref": "GWVpcPrivateSubnet2Subnet19729786"
-        }
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PrivateSubnet2/RouteTableAssociation"
-      }
-    },
-    "GWVpcPrivateSubnet2DefaultRoute16B5F270": {
-      "Type": "AWS::EC2::Route",
-      "Properties": {
-        "RouteTableId": {
-          "Ref": "GWVpcPrivateSubnet2RouteTable6364FB63"
-        },
-        "DestinationCidrBlock": "0.0.0.0/0",
-        "NatGatewayId": {
-          "Ref": "GWVpcPublicSubnet2NATGateway6931392F"
-        }
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/PrivateSubnet2/DefaultRoute"
-      }
-    },
-    "GWVpcIGW0A019878": {
-      "Type": "AWS::EC2::InternetGateway",
-      "Properties": {
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "cdk-stack-infer-graph/GWVpc"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/IGW"
-      }
-    },
-    "GWVpcVPCGW69CA13EA": {
-      "Type": "AWS::EC2::VPCGatewayAttachment",
-      "Properties": {
-        "VpcId": {
-          "Ref": "GWVpc58472F73"
-        },
-        "InternetGatewayId": {
-          "Ref": "GWVpcIGW0A019878"
-        }
-      },
-      "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/GWVpc/VPCGW"
-      }
-    },
     "gwlambdatrainroleD4532D6A": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -549,11 +97,249 @@
                 ":iam::aws:policy/AmazonSageMakerFullAccess"
               ]
             ]
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
+              ]
+            ]
           }
         ]
       },
       "Metadata": {
         "aws:cdk:path": "cdk-stack-infer-graph/gw_sagemaker_train_role/Resource"
+      }
+    },
+    "graphtrainlambda00C23353": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "AssetParameters35d7465e44156e024f834f20c1b764dea526f1744b4bef4218ada97046e996b6S3BucketFA99A701"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameters35d7465e44156e024f834f20c1b764dea526f1744b4bef4218ada97046e996b6S3VersionKey4A6D8503"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Fn::Select": [
+                    1,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameters35d7465e44156e024f834f20c1b764dea526f1744b4bef4218ada97046e996b6S3VersionKey4A6D8503"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        "Handler": "graph-train.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "gwlambdatrainroleD4532D6A",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.7",
+        "Environment": {
+          "Variables": {
+            "INPUT_TRAIN_BUCKET": "graph-train-train_bucket",
+            "INPUT_VALIDATION_BUCKET": "graph-train-validation-bucket",
+            "OUTPUT_BUCKET": "graph-train-bucket-model-2020-12-12-16-41-23-240",
+            "NAME": "graph-train",
+            "IMAGE_URI": "856419311962.dkr.ecr.us-east-1.amazonaws.com/sagemaker-recsys-graph-train",
+            "SAGEMAKER_ROLE": {
+              "Fn::GetAtt": [
+                "gwsagemakertrainroleF0C213EC",
+                "Arn"
+              ]
+            },
+            "INSTANCE": "ml.g4dn.xlarge"
+          }
+        }
+      },
+      "DependsOn": [
+        "gwlambdatrainroleD4532D6A"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "cdk-stack-infer-graph/graph-train-lambda/Resource",
+        "aws:asset:path": "asset.35d7465e44156e024f834f20c1b764dea526f1744b4bef4218ada97046e996b6",
+        "aws:asset:property": "Code"
+      }
+    },
+    "graphtrainbucketevent20201212164123240E548C43C": {
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Retain",
+      "Metadata": {
+        "aws:cdk:path": "cdk-stack-infer-graph/graph-train-bucket-event-2020-12-12-16-41-23-240/Resource"
+      }
+    },
+    "graphtrainbucketevent20201212164123240Notifications5217CE63": {
+      "Type": "Custom::S3BucketNotifications",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691",
+            "Arn"
+          ]
+        },
+        "BucketName": {
+          "Ref": "graphtrainbucketevent20201212164123240E548C43C"
+        },
+        "NotificationConfiguration": {
+          "LambdaFunctionConfigurations": [
+            {
+              "Events": [
+                "s3:ObjectCreated:*"
+              ],
+              "LambdaFunctionArn": {
+                "Fn::GetAtt": [
+                  "graphtrainlambda00C23353",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "DependsOn": [
+        "graphtrainbucketevent20201212164123240AllowBucketNotificationsTocdkstackinfergraphgraphtrainlambda38F36A835A0513E9"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "cdk-stack-infer-graph/graph-train-bucket-event-2020-12-12-16-41-23-240/Notifications/Resource"
+      }
+    },
+    "graphtrainbucketevent20201212164123240AllowBucketNotificationsTocdkstackinfergraphgraphtrainlambda38F36A835A0513E9": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "graphtrainlambda00C23353",
+            "Arn"
+          ]
+        },
+        "Principal": "s3.amazonaws.com",
+        "SourceAccount": {
+          "Ref": "AWS::AccountId"
+        },
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "graphtrainbucketevent20201212164123240E548C43C",
+            "Arn"
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "cdk-stack-infer-graph/graph-train-bucket-event-2020-12-12-16-41-23-240/AllowBucketNotificationsTocdkstackinfergraphgraphtrainlambda38F36A83"
+      }
+    },
+    "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "cdk-stack-infer-graph/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/Resource"
+      }
+    },
+    "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "s3:PutBucketNotification",
+              "Effect": "Allow",
+              "Resource": "*"
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36",
+        "Roles": [
+          {
+            "Ref": "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "cdk-stack-infer-graph/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/DefaultPolicy/Resource"
+      }
+    },
+    "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Description": "AWS CloudFormation handler for \"Custom::S3BucketNotifications\" resources (@aws-cdk/aws-s3)",
+        "Code": {
+          "ZipFile": "exports.handler = (event, context) => {\n    // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-extraneous-dependencies\n    const s3 = new (require('aws-sdk').S3)();\n    // eslint-disable-next-line @typescript-eslint/no-require-imports\n    const https = require('https');\n    // eslint-disable-next-line @typescript-eslint/no-require-imports\n    const url = require('url');\n    log(JSON.stringify(event, undefined, 2));\n    const props = event.ResourceProperties;\n    if (event.RequestType === 'Delete') {\n        props.NotificationConfiguration = {}; // this is how you clean out notifications\n    }\n    const req = {\n        Bucket: props.BucketName,\n        NotificationConfiguration: props.NotificationConfiguration,\n    };\n    return s3.putBucketNotificationConfiguration(req, (err, data) => {\n        log({ err, data });\n        if (err) {\n            return submitResponse('FAILED', err.message + `\\nMore information in CloudWatch Log Stream: ${context.logStreamName}`);\n        }\n        else {\n            return submitResponse('SUCCESS');\n        }\n    });\n    function log(obj) {\n        console.error(event.RequestId, event.StackId, event.LogicalResourceId, obj);\n    }\n    // eslint-disable-next-line max-len\n    // adapted from https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-cfnresponsemodule\n    // to allow sending an error messge as a reason.\n    function submitResponse(responseStatus, reason) {\n        const responseBody = JSON.stringify({\n            Status: responseStatus,\n            Reason: reason || 'See the details in CloudWatch Log Stream: ' + context.logStreamName,\n            PhysicalResourceId: event.PhysicalResourceId || event.LogicalResourceId,\n            StackId: event.StackId,\n            RequestId: event.RequestId,\n            LogicalResourceId: event.LogicalResourceId,\n            NoEcho: false,\n        });\n        log({ responseBody });\n        const parsedUrl = url.parse(event.ResponseURL);\n        const options = {\n            hostname: parsedUrl.hostname,\n            port: 443,\n            path: parsedUrl.path,\n            method: 'PUT',\n            headers: {\n                'content-type': '',\n                'content-length': responseBody.length,\n            },\n        };\n        const request = https.request(options, (r) => {\n            log({ statusCode: r.statusCode, statusMessage: r.statusMessage });\n            context.done();\n        });\n        request.on('error', (error) => {\n            log({ sendError: error });\n            context.done();\n        });\n        request.write(responseBody);\n        request.end();\n    }\n};"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs10.x",
+        "Timeout": 300
+      },
+      "DependsOn": [
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36",
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "cdk-stack-infer-graph/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Resource"
       }
     },
     "FargateTaskExecutionServiceRole0484E2D1": {
@@ -705,7 +491,15 @@
             "Environment": [
               {
                 "Name": "KG_PATH",
-                "Value": "s3://autorec"
+                "Value": "s3://autorec-1"
+              },
+              {
+                "Name": "INPUT_BUCKET_NAME",
+                "Value": "s3://autorec-1/input_graph/"
+              },
+              {
+                "Name": "OUTPUT_BUCKET_NAME",
+                "Value": "s3://autorec-1/output_graph/"
               }
             ],
             "Essential": true,
@@ -794,18 +588,14 @@
         "Scheme": "internet-facing",
         "Subnets": [
           {
-            "Ref": "GWVpcPublicSubnet1Subnet49EB8E88"
+            "Fn::ImportValue": "cdk-stack-infer-infra:ExportsOutputRefVpcPublicSubnet1Subnet5C2D37C4FFA2B456"
           },
           {
-            "Ref": "GWVpcPublicSubnet2Subnet1A7D037F"
+            "Fn::ImportValue": "cdk-stack-infer-infra:ExportsOutputRefVpcPublicSubnet2Subnet691E08A351552740"
           }
         ],
         "Type": "network"
       },
-      "DependsOn": [
-        "GWVpcPublicSubnet1DefaultRoute76558746",
-        "GWVpcPublicSubnet2DefaultRoute200BE8FE"
-      ],
       "Metadata": {
         "aws:cdk:path": "cdk-stack-infer-graph/graph-inference-service/LB/Resource"
       }
@@ -838,7 +628,7 @@
         "Protocol": "TCP",
         "TargetType": "ip",
         "VpcId": {
-          "Ref": "GWVpc58472F73"
+          "Fn::ImportValue": "cdk-stack-infer-infra:ExportsOutputRefVpc8378EB38272D6E3A"
         }
       },
       "Metadata": {
@@ -881,10 +671,10 @@
             ],
             "Subnets": [
               {
-                "Ref": "GWVpcPublicSubnet1Subnet49EB8E88"
+                "Fn::ImportValue": "cdk-stack-infer-infra:ExportsOutputRefVpcPublicSubnet1Subnet5C2D37C4FFA2B456"
               },
               {
-                "Ref": "GWVpcPublicSubnet2Subnet1A7D037F"
+                "Fn::ImportValue": "cdk-stack-infer-infra:ExportsOutputRefVpcPublicSubnet2Subnet691E08A351552740"
               }
             ]
           }
@@ -922,7 +712,7 @@
           }
         ],
         "VpcId": {
-          "Ref": "GWVpc58472F73"
+          "Fn::ImportValue": "cdk-stack-infer-infra:ExportsOutputRefVpc8378EB38272D6E3A"
         }
       },
       "Metadata": {
@@ -996,15 +786,172 @@
         "aws:cdk:path": "cdk-stack-infer-graph/graph-inference-service/Service/TaskCount/Target/CpuScaling/Resource"
       }
     },
+    "dkntrainlambda53C85A06": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "AssetParameters35d7465e44156e024f834f20c1b764dea526f1744b4bef4218ada97046e996b6S3BucketFA99A701"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameters35d7465e44156e024f834f20c1b764dea526f1744b4bef4218ada97046e996b6S3VersionKey4A6D8503"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Fn::Select": [
+                    1,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameters35d7465e44156e024f834f20c1b764dea526f1744b4bef4218ada97046e996b6S3VersionKey4A6D8503"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        "Handler": "dkn-train.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "gwlambdatrainroleD4532D6A",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.7",
+        "Environment": {
+          "Variables": {
+            "INPUT_TRAIN_BUCKET": "autorec-great-wisdom/train.csv/",
+            "INPUT_VALIDATION_BUCKET": "autorec-great-wisdom/test.csv/",
+            "OUTPUT_BUCKET": "autorec-great-wisdom/output_model/",
+            "NAME": "dkn-train",
+            "IMAGE_URI": "002224604296.dkr.ecr.us-east-1.amazonaws.com/sagemaker-recsys-dkn-train",
+            "SAGEMAKER_ROLE": {
+              "Fn::GetAtt": [
+                "gwsagemakertrainroleF0C213EC",
+                "Arn"
+              ]
+            },
+            "INSTANCE": "ml.p2.xlarge"
+          }
+        }
+      },
+      "DependsOn": [
+        "gwlambdatrainroleD4532D6A"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "cdk-stack-infer-graph/dkn-train-lambda/Resource",
+        "aws:asset:path": "asset.35d7465e44156e024f834f20c1b764dea526f1744b4bef4218ada97046e996b6",
+        "aws:asset:property": "Code"
+      }
+    },
+    "dkntrainbucketevent0D476D16": {
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Retain",
+      "Metadata": {
+        "aws:cdk:path": "cdk-stack-infer-graph/dkn-train-bucket-event/Resource"
+      }
+    },
+    "dkntrainbucketeventNotifications1DC82E01": {
+      "Type": "Custom::S3BucketNotifications",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691",
+            "Arn"
+          ]
+        },
+        "BucketName": {
+          "Ref": "dkntrainbucketevent0D476D16"
+        },
+        "NotificationConfiguration": {
+          "LambdaFunctionConfigurations": [
+            {
+              "Events": [
+                "s3:ObjectCreated:*"
+              ],
+              "LambdaFunctionArn": {
+                "Fn::GetAtt": [
+                  "dkntrainlambda53C85A06",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "DependsOn": [
+        "dkntrainbucketeventAllowBucketNotificationsTocdkstackinfergraphdkntrainlambdaC28563130AF5BBD3"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "cdk-stack-infer-graph/dkn-train-bucket-event/Notifications/Resource"
+      }
+    },
+    "dkntrainbucketeventAllowBucketNotificationsTocdkstackinfergraphdkntrainlambdaC28563130AF5BBD3": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "dkntrainlambda53C85A06",
+            "Arn"
+          ]
+        },
+        "Principal": "s3.amazonaws.com",
+        "SourceAccount": {
+          "Ref": "AWS::AccountId"
+        },
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "dkntrainbucketevent0D476D16",
+            "Arn"
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "cdk-stack-infer-graph/dkn-train-bucket-event/AllowBucketNotificationsTocdkstackinfergraphdkntrainlambdaC2856313"
+      }
+    },
     "CDKMetadata": {
       "Type": "AWS::CDK::Metadata",
       "Properties": {
-        "Modules": "aws-cdk=1.74.0,@aws-cdk/assets=1.75.0,@aws-cdk/aws-apigateway=1.75.0,@aws-cdk/aws-apigatewayv2=1.75.0,@aws-cdk/aws-applicationautoscaling=1.75.0,@aws-cdk/aws-autoscaling=1.75.0,@aws-cdk/aws-autoscaling-common=1.75.0,@aws-cdk/aws-autoscaling-hooktargets=1.75.0,@aws-cdk/aws-batch=1.75.0,@aws-cdk/aws-certificatemanager=1.75.0,@aws-cdk/aws-cloudformation=1.75.0,@aws-cdk/aws-cloudfront=1.75.0,@aws-cdk/aws-cloudwatch=1.75.0,@aws-cdk/aws-codebuild=1.75.0,@aws-cdk/aws-codecommit=1.75.0,@aws-cdk/aws-codeguruprofiler=1.75.0,@aws-cdk/aws-codepipeline=1.75.0,@aws-cdk/aws-cognito=1.75.0,@aws-cdk/aws-dynamodb=1.75.0,@aws-cdk/aws-ec2=1.75.0,@aws-cdk/aws-ecr=1.75.0,@aws-cdk/aws-ecr-assets=1.75.0,@aws-cdk/aws-ecs=1.75.0,@aws-cdk/aws-ecs-patterns=1.75.0,@aws-cdk/aws-efs=1.75.0,@aws-cdk/aws-elasticache=1.75.0,@aws-cdk/aws-elasticloadbalancing=1.75.0,@aws-cdk/aws-elasticloadbalancingv2=1.75.0,@aws-cdk/aws-events=1.75.0,@aws-cdk/aws-events-targets=1.75.0,@aws-cdk/aws-iam=1.75.0,@aws-cdk/aws-kinesis=1.75.0,@aws-cdk/aws-kinesisfirehose=1.75.0,@aws-cdk/aws-kms=1.75.0,@aws-cdk/aws-lambda=1.75.0,@aws-cdk/aws-lambda-event-sources=1.75.0,@aws-cdk/aws-logs=1.75.0,@aws-cdk/aws-rds=1.75.0,@aws-cdk/aws-route53=1.75.0,@aws-cdk/aws-route53-targets=1.75.0,@aws-cdk/aws-s3=1.75.0,@aws-cdk/aws-s3-assets=1.75.0,@aws-cdk/aws-s3-notifications=1.75.0,@aws-cdk/aws-sam=1.75.0,@aws-cdk/aws-secretsmanager=1.75.0,@aws-cdk/aws-servicediscovery=1.75.0,@aws-cdk/aws-sns=1.75.0,@aws-cdk/aws-sns-subscriptions=1.75.0,@aws-cdk/aws-sqs=1.75.0,@aws-cdk/aws-ssm=1.75.0,@aws-cdk/aws-stepfunctions=1.75.0,@aws-cdk/cloud-assembly-schema=1.75.0,@aws-cdk/core=1.75.0,@aws-cdk/custom-resources=1.75.0,@aws-cdk/cx-api=1.75.0,@aws-cdk/region-info=1.75.0,jsii-runtime=Python/3.7.9"
+        "Modules": "aws-cdk=1.75.0,@aws-cdk/assets=1.75.0,@aws-cdk/aws-apigateway=1.75.0,@aws-cdk/aws-apigatewayv2=1.75.0,@aws-cdk/aws-applicationautoscaling=1.75.0,@aws-cdk/aws-autoscaling=1.75.0,@aws-cdk/aws-autoscaling-common=1.75.0,@aws-cdk/aws-autoscaling-hooktargets=1.75.0,@aws-cdk/aws-batch=1.75.0,@aws-cdk/aws-certificatemanager=1.75.0,@aws-cdk/aws-cloudformation=1.75.0,@aws-cdk/aws-cloudfront=1.75.0,@aws-cdk/aws-cloudwatch=1.75.0,@aws-cdk/aws-codebuild=1.75.0,@aws-cdk/aws-codecommit=1.75.0,@aws-cdk/aws-codeguruprofiler=1.75.0,@aws-cdk/aws-codepipeline=1.75.0,@aws-cdk/aws-cognito=1.75.0,@aws-cdk/aws-dynamodb=1.75.0,@aws-cdk/aws-ec2=1.75.0,@aws-cdk/aws-ecr=1.75.0,@aws-cdk/aws-ecr-assets=1.75.0,@aws-cdk/aws-ecs=1.75.0,@aws-cdk/aws-ecs-patterns=1.75.0,@aws-cdk/aws-efs=1.75.0,@aws-cdk/aws-elasticache=1.75.0,@aws-cdk/aws-elasticloadbalancing=1.75.0,@aws-cdk/aws-elasticloadbalancingv2=1.75.0,@aws-cdk/aws-events=1.75.0,@aws-cdk/aws-events-targets=1.75.0,@aws-cdk/aws-iam=1.75.0,@aws-cdk/aws-kinesis=1.75.0,@aws-cdk/aws-kinesisfirehose=1.75.0,@aws-cdk/aws-kms=1.75.0,@aws-cdk/aws-lambda=1.75.0,@aws-cdk/aws-lambda-event-sources=1.75.0,@aws-cdk/aws-logs=1.75.0,@aws-cdk/aws-rds=1.75.0,@aws-cdk/aws-route53=1.75.0,@aws-cdk/aws-route53-targets=1.75.0,@aws-cdk/aws-s3=1.75.0,@aws-cdk/aws-s3-assets=1.75.0,@aws-cdk/aws-s3-notifications=1.75.0,@aws-cdk/aws-sam=1.75.0,@aws-cdk/aws-secretsmanager=1.75.0,@aws-cdk/aws-servicediscovery=1.75.0,@aws-cdk/aws-sns=1.75.0,@aws-cdk/aws-sns-subscriptions=1.75.0,@aws-cdk/aws-sqs=1.75.0,@aws-cdk/aws-ssm=1.75.0,@aws-cdk/aws-stepfunctions=1.75.0,@aws-cdk/cloud-assembly-schema=1.75.0,@aws-cdk/core=1.75.0,@aws-cdk/custom-resources=1.75.0,@aws-cdk/cx-api=1.75.0,@aws-cdk/region-info=1.75.0,jsii-runtime=Python/3.7.7"
       },
       "Metadata": {
         "aws:cdk:path": "cdk-stack-infer-graph/CDKMetadata/Default"
       },
       "Condition": "CDKMetadataAvailable"
+    }
+  },
+  "Parameters": {
+    "AssetParameters35d7465e44156e024f834f20c1b764dea526f1744b4bef4218ada97046e996b6S3BucketFA99A701": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"35d7465e44156e024f834f20c1b764dea526f1744b4bef4218ada97046e996b6\""
+    },
+    "AssetParameters35d7465e44156e024f834f20c1b764dea526f1744b4bef4218ada97046e996b6S3VersionKey4A6D8503": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"35d7465e44156e024f834f20c1b764dea526f1744b4bef4218ada97046e996b6\""
+    },
+    "AssetParameters35d7465e44156e024f834f20c1b764dea526f1744b4bef4218ada97046e996b6ArtifactHash393816D6": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"35d7465e44156e024f834f20c1b764dea526f1744b4bef4218ada97046e996b6\""
     }
   },
   "Outputs": {

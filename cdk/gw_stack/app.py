@@ -10,7 +10,7 @@ from deploy.gw_inferhandler_stack import GWInferHandlerStack
 from deploy.gw_sample_stack import GWSampleStack
 from deploy.gw_loginto_stack import GWLogintoStack
 
-from deploy.gw_infra_stack_test import CdkInfraStackTest
+# from deploy.gw_infra_stack_test import CdkInfraStackTest
 
 # from deploy.gw_trainhandler_stack import GWTrainHandlerStack
 

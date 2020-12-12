@@ -200,11 +200,14 @@
             "Value": "false"
           }
         ],
-        "Scheme": "internet-facing",
+        "Scheme": "internal",
         "Subnets": [
-          "subnet-082f2fa7f0bd5e32d",
-          "subnet-027dfd44ed62da3a5",
-          "subnet-0075e0d9b93e1ca81"
+          {
+            "Fn::ImportValue": "cdk-stack-infer-infra:ExportsOutputRefVpcPrivateSubnet1Subnet536B997AFD4CC940"
+          },
+          {
+            "Fn::ImportValue": "cdk-stack-infer-infra:ExportsOutputRefVpcPrivateSubnet2Subnet3788AAA1380949A3"
+          }
         ],
         "Type": "network"
       },
@@ -239,7 +242,9 @@
         "Port": 80,
         "Protocol": "TCP",
         "TargetType": "ip",
-        "VpcId": "vpc-03dd7e12c2b20dc08"
+        "VpcId": {
+          "Fn::ImportValue": "cdk-stack-infer-infra:ExportsOutputRefVpc8378EB38272D6E3A"
+        }
       },
       "Metadata": {
         "aws:cdk:path": "cdk-stack-infer-handler/InferHandler-Service/LB/PublicListener/ECSGroup/Resource"
@@ -280,9 +285,12 @@
               }
             ],
             "Subnets": [
-              "subnet-082f2fa7f0bd5e32d",
-              "subnet-027dfd44ed62da3a5",
-              "subnet-0075e0d9b93e1ca81"
+              {
+                "Fn::ImportValue": "cdk-stack-infer-infra:ExportsOutputRefVpcPublicSubnet1Subnet5C2D37C4FFA2B456"
+              },
+              {
+                "Fn::ImportValue": "cdk-stack-infer-infra:ExportsOutputRefVpcPublicSubnet2Subnet691E08A351552740"
+              }
             ]
           }
         },
@@ -311,14 +319,18 @@
         ],
         "SecurityGroupIngress": [
           {
-            "CidrIp": "10.10.0.0/16",
+            "CidrIp": {
+              "Fn::ImportValue": "cdk-stack-infer-infra:ExportsOutputFnGetAttVpc8378EB38CidrBlock14DD2396"
+            },
             "Description": "Allow http inbound from VPC",
             "FromPort": 8080,
             "IpProtocol": "tcp",
             "ToPort": 8080
           }
         ],
-        "VpcId": "vpc-03dd7e12c2b20dc08"
+        "VpcId": {
+          "Fn::ImportValue": "cdk-stack-infer-infra:ExportsOutputRefVpc8378EB38272D6E3A"
+        }
       },
       "Metadata": {
         "aws:cdk:path": "cdk-stack-infer-handler/InferHandler-Service/Service/SecurityGroup/Resource"
@@ -394,7 +406,7 @@
     "CDKMetadata": {
       "Type": "AWS::CDK::Metadata",
       "Properties": {
-        "Modules": "aws-cdk=1.74.0,@aws-cdk/assets=1.75.0,@aws-cdk/aws-apigateway=1.75.0,@aws-cdk/aws-apigatewayv2=1.75.0,@aws-cdk/aws-applicationautoscaling=1.75.0,@aws-cdk/aws-autoscaling=1.75.0,@aws-cdk/aws-autoscaling-common=1.75.0,@aws-cdk/aws-autoscaling-hooktargets=1.75.0,@aws-cdk/aws-batch=1.75.0,@aws-cdk/aws-certificatemanager=1.75.0,@aws-cdk/aws-cloudformation=1.75.0,@aws-cdk/aws-cloudfront=1.75.0,@aws-cdk/aws-cloudwatch=1.75.0,@aws-cdk/aws-codebuild=1.75.0,@aws-cdk/aws-codecommit=1.75.0,@aws-cdk/aws-codeguruprofiler=1.75.0,@aws-cdk/aws-codepipeline=1.75.0,@aws-cdk/aws-cognito=1.75.0,@aws-cdk/aws-dynamodb=1.75.0,@aws-cdk/aws-ec2=1.75.0,@aws-cdk/aws-ecr=1.75.0,@aws-cdk/aws-ecr-assets=1.75.0,@aws-cdk/aws-ecs=1.75.0,@aws-cdk/aws-ecs-patterns=1.75.0,@aws-cdk/aws-efs=1.75.0,@aws-cdk/aws-elasticache=1.75.0,@aws-cdk/aws-elasticloadbalancing=1.75.0,@aws-cdk/aws-elasticloadbalancingv2=1.75.0,@aws-cdk/aws-events=1.75.0,@aws-cdk/aws-events-targets=1.75.0,@aws-cdk/aws-iam=1.75.0,@aws-cdk/aws-kinesis=1.75.0,@aws-cdk/aws-kinesisfirehose=1.75.0,@aws-cdk/aws-kms=1.75.0,@aws-cdk/aws-lambda=1.75.0,@aws-cdk/aws-lambda-event-sources=1.75.0,@aws-cdk/aws-logs=1.75.0,@aws-cdk/aws-rds=1.75.0,@aws-cdk/aws-route53=1.75.0,@aws-cdk/aws-route53-targets=1.75.0,@aws-cdk/aws-s3=1.75.0,@aws-cdk/aws-s3-assets=1.75.0,@aws-cdk/aws-s3-notifications=1.75.0,@aws-cdk/aws-sam=1.75.0,@aws-cdk/aws-secretsmanager=1.75.0,@aws-cdk/aws-servicediscovery=1.75.0,@aws-cdk/aws-sns=1.75.0,@aws-cdk/aws-sns-subscriptions=1.75.0,@aws-cdk/aws-sqs=1.75.0,@aws-cdk/aws-ssm=1.75.0,@aws-cdk/aws-stepfunctions=1.75.0,@aws-cdk/cloud-assembly-schema=1.75.0,@aws-cdk/core=1.75.0,@aws-cdk/custom-resources=1.75.0,@aws-cdk/cx-api=1.75.0,@aws-cdk/region-info=1.75.0,jsii-runtime=Python/3.7.9"
+        "Modules": "aws-cdk=1.75.0,@aws-cdk/assets=1.75.0,@aws-cdk/aws-apigateway=1.75.0,@aws-cdk/aws-apigatewayv2=1.75.0,@aws-cdk/aws-applicationautoscaling=1.75.0,@aws-cdk/aws-autoscaling=1.75.0,@aws-cdk/aws-autoscaling-common=1.75.0,@aws-cdk/aws-autoscaling-hooktargets=1.75.0,@aws-cdk/aws-batch=1.75.0,@aws-cdk/aws-certificatemanager=1.75.0,@aws-cdk/aws-cloudformation=1.75.0,@aws-cdk/aws-cloudfront=1.75.0,@aws-cdk/aws-cloudwatch=1.75.0,@aws-cdk/aws-codebuild=1.75.0,@aws-cdk/aws-codecommit=1.75.0,@aws-cdk/aws-codeguruprofiler=1.75.0,@aws-cdk/aws-codepipeline=1.75.0,@aws-cdk/aws-cognito=1.75.0,@aws-cdk/aws-dynamodb=1.75.0,@aws-cdk/aws-ec2=1.75.0,@aws-cdk/aws-ecr=1.75.0,@aws-cdk/aws-ecr-assets=1.75.0,@aws-cdk/aws-ecs=1.75.0,@aws-cdk/aws-ecs-patterns=1.75.0,@aws-cdk/aws-efs=1.75.0,@aws-cdk/aws-elasticache=1.75.0,@aws-cdk/aws-elasticloadbalancing=1.75.0,@aws-cdk/aws-elasticloadbalancingv2=1.75.0,@aws-cdk/aws-events=1.75.0,@aws-cdk/aws-events-targets=1.75.0,@aws-cdk/aws-iam=1.75.0,@aws-cdk/aws-kinesis=1.75.0,@aws-cdk/aws-kinesisfirehose=1.75.0,@aws-cdk/aws-kms=1.75.0,@aws-cdk/aws-lambda=1.75.0,@aws-cdk/aws-lambda-event-sources=1.75.0,@aws-cdk/aws-logs=1.75.0,@aws-cdk/aws-rds=1.75.0,@aws-cdk/aws-route53=1.75.0,@aws-cdk/aws-route53-targets=1.75.0,@aws-cdk/aws-s3=1.75.0,@aws-cdk/aws-s3-assets=1.75.0,@aws-cdk/aws-s3-notifications=1.75.0,@aws-cdk/aws-sam=1.75.0,@aws-cdk/aws-secretsmanager=1.75.0,@aws-cdk/aws-servicediscovery=1.75.0,@aws-cdk/aws-sns=1.75.0,@aws-cdk/aws-sns-subscriptions=1.75.0,@aws-cdk/aws-sqs=1.75.0,@aws-cdk/aws-ssm=1.75.0,@aws-cdk/aws-stepfunctions=1.75.0,@aws-cdk/cloud-assembly-schema=1.75.0,@aws-cdk/core=1.75.0,@aws-cdk/custom-resources=1.75.0,@aws-cdk/cx-api=1.75.0,@aws-cdk/region-info=1.75.0,jsii-runtime=Python/3.7.7"
       },
       "Metadata": {
         "aws:cdk:path": "cdk-stack-infer-handler/CDKMetadata/Default"
