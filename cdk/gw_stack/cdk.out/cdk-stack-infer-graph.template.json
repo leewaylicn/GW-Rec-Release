@@ -169,7 +169,7 @@
           "Variables": {
             "INPUT_TRAIN_BUCKET": "graph-train-train_bucket",
             "INPUT_VALIDATION_BUCKET": "graph-train-validation-bucket",
-            "OUTPUT_BUCKET": "graph-train-bucket-model-2020-12-12-16-41-23-240",
+            "OUTPUT_BUCKET": "graph-train-bucket-model-2020-12-13-16-06-14-690",
             "NAME": "graph-train",
             "IMAGE_URI": "856419311962.dkr.ecr.us-east-1.amazonaws.com/sagemaker-recsys-graph-train",
             "SAGEMAKER_ROLE": {
@@ -191,15 +191,15 @@
         "aws:asset:property": "Code"
       }
     },
-    "graphtrainbucketevent20201212164123240E548C43C": {
+    "graphtrainbucketevent20201213160614690C4D6304C": {
       "Type": "AWS::S3::Bucket",
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Retain",
       "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/graph-train-bucket-event-2020-12-12-16-41-23-240/Resource"
+        "aws:cdk:path": "cdk-stack-infer-graph/graph-train-bucket-event-2020-12-13-16-06-14-690/Resource"
       }
     },
-    "graphtrainbucketevent20201212164123240Notifications5217CE63": {
+    "graphtrainbucketevent20201213160614690NotificationsF7253110": {
       "Type": "Custom::S3BucketNotifications",
       "Properties": {
         "ServiceToken": {
@@ -209,7 +209,7 @@
           ]
         },
         "BucketName": {
-          "Ref": "graphtrainbucketevent20201212164123240E548C43C"
+          "Ref": "graphtrainbucketevent20201213160614690C4D6304C"
         },
         "NotificationConfiguration": {
           "LambdaFunctionConfigurations": [
@@ -228,13 +228,13 @@
         }
       },
       "DependsOn": [
-        "graphtrainbucketevent20201212164123240AllowBucketNotificationsTocdkstackinfergraphgraphtrainlambda38F36A835A0513E9"
+        "graphtrainbucketevent20201213160614690AllowBucketNotificationsTocdkstackinfergraphgraphtrainlambda38F36A836692913C"
       ],
       "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/graph-train-bucket-event-2020-12-12-16-41-23-240/Notifications/Resource"
+        "aws:cdk:path": "cdk-stack-infer-graph/graph-train-bucket-event-2020-12-13-16-06-14-690/Notifications/Resource"
       }
     },
-    "graphtrainbucketevent20201212164123240AllowBucketNotificationsTocdkstackinfergraphgraphtrainlambda38F36A835A0513E9": {
+    "graphtrainbucketevent20201213160614690AllowBucketNotificationsTocdkstackinfergraphgraphtrainlambda38F36A836692913C": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
@@ -250,13 +250,13 @@
         },
         "SourceArn": {
           "Fn::GetAtt": [
-            "graphtrainbucketevent20201212164123240E548C43C",
+            "graphtrainbucketevent20201213160614690C4D6304C",
             "Arn"
           ]
         }
       },
       "Metadata": {
-        "aws:cdk:path": "cdk-stack-infer-graph/graph-train-bucket-event-2020-12-12-16-41-23-240/AllowBucketNotificationsTocdkstackinfergraphgraphtrainlambda38F36A83"
+        "aws:cdk:path": "cdk-stack-infer-graph/graph-train-bucket-event-2020-12-13-16-06-14-690/AllowBucketNotificationsTocdkstackinfergraphgraphtrainlambda38F36A83"
       }
     },
     "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC": {

@@ -34,12 +34,12 @@ infra_stack = CdkInfraStack(
                 "cdk-stack-infer-infra"
             )
 
-sample_stack = GWSampleStack(
-                app, 
-                "cdk-stack-infer-Sample", 
-                infra_stack.vpc, 
-                ecs_role = infra_stack.ecs_role
-            )
+# sample_stack = GWSampleStack(
+#                 app, 
+#                 "cdk-stack-infer-Sample", 
+#                 infra_stack.vpc, 
+#                 ecs_role = infra_stack.ecs_role
+#             )
 
 dkn_stack = GWDknStack(
             app, 
