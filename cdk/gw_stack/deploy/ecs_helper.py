@@ -38,13 +38,12 @@ class GWEcsHelper:
     @staticmethod
     def _create_fagate_queue_autoscaling(stack, vpc, image, name, 
             ecs_role=None, env=None, public_load_balancer=False):
-        '''
+
         cluster = ecs.Cluster(
             stack, 
             name+'fargate-service-autoscaling', 
             vpc=vpc
         )
-        '''
 
         ecs_log = ecs.LogDrivers.aws_logs(stream_prefix=name)
 
@@ -61,6 +60,7 @@ class GWEcsHelper:
             task = ecs.FargateTaskDefinition(
                 stack,
                 name+'-Task',
+                desired_count=1,
                 memory_limit_mib=memory,
                 cpu=cpu
             )
@@ -76,14 +76,33 @@ class GWEcsHelper:
                 environment=env
         )
 
-        '''
-        cluster.add_capacity(image,
-                instance_type=ec2.InstanceType("t2.micro")
+        ecs.FargateService(stack, name,
+            cluster=cluster,
+            task_definition=task,
+            desired_count=1
         )
-        '''
 
         # deploy and run this task once
-        run_task_at_once = RunTask(stack, name, task=task)
+        #run_task_at_once = RunTask(stack, name, task=task)
+
+        '''
+        asg = autoscaling.AutoScalingGroup(
+            self, "MyFleet",
+            instance_type=ec2.InstanceType("t2.xlarge"),
+            machine_image=ecs.EcsOptimizedAmi(),
+            associate_public_ip_address=True,
+            update_type=autoscaling.UpdateType.REPLACING_UPDATE,
+            desired_capacity=1,
+            vpc=vpc,
+            vpc_subnets={ 'subnet_type': ec2.SubnetType.PUBLIC },
+        )
+
+        run_task_at_once.cluster.add_auto_scaling_group(asg)
+        run_task_at_once.cluster.add_capacity(
+            "DefaultAutoScalingGroup",
+            instance_type=ec2.InstanceType("t2.xlarge")        
+        )
+        '''
 
         return "http://localhost"
 
