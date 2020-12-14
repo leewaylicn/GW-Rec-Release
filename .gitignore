@@ -25,7 +25,7 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-*.json
+cdk.out/
 MANIFEST
 
 # PyInstaller
