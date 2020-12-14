@@ -80,6 +80,8 @@ RUN rm -rf /var/lib/apt/lists/*
 #  && pip install marisa_trie \
 #  && pip install dgl==0.4.3.post2 \
 #  && pip install -e git+ssh://git@github.com/xiaotinghe/dgl-ke.git#egg=dglke&subdirectory=python
+RUN pip3 install pip -U
+RUN pip3 config set global.index-url https://opentuna.cn/pypi/web/simple
 RUN pip3 install pandas \
  && pip3 install numpy \
  && pip3 install boto3
@@ -90,7 +92,8 @@ RUN pip3 install --no-cache-dir gunicorn
 # RUN pip3 install --no-cache-dir fastHan
 RUN pip3 install --no-cache-dir marisa_trie
 RUN pip3 install --no-cache-dir dgl==0.4.3.post2
-RUN pip3 install -e git+http://git@github.com/xiaotinghe/fastHan.git'#egg=fastHan'
+# RUN pip3 install -e git+http://git@github.com/xiaotinghe/fastHan.git'#egg=fastHan'
+RUN pip3 install -e git+https://github.com/fastnlp/fastHan.git'#egg=fastHan'
 RUN pip3 install -e git+http://git@github.com/xiaotinghe/dgl-ke.git'#egg=dglke&subdirectory=python'
 RUN pip3 install --no-cache-dir s3fs
 

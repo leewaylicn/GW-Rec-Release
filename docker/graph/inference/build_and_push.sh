@@ -13,7 +13,7 @@ account=$(aws sts get-caller-identity --query Account --output text)
 
 # Get the region defined in the current configuration (default to us-west-2 if none defined)
 region=$(aws configure get region)
-region=${region:-us-west-1}
+# region=${region:-us-west-1}
 
 fullname="${account}.dkr.ecr.${region}.amazonaws.com.cn/${algorithm_name}:latest"
 
@@ -37,13 +37,16 @@ fi
 
 # Get the login command from ECR and execute it directly
 #$(aws ecr get-login --region ${region} --no-include-email)
-eval $(aws ecr get-login --region ${region} --no-include-email)
-eval $(aws ecr get-login --registry-ids ${registry_id} --region ${region} --no-include-email)
+# eval $(aws ecr get-login --region ${region} --no-include-email)
+# eval $(aws ecr get-login --registry-ids ${registry_id} --region ${region} --no-include-email)
 
 # Build the docker image locally with the image name and then push it to ECR
 # with the full name.
+aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${registry_uri}
 
 docker build  -t ${algorithm_name} . --build-arg REGISTRY_URI=${registry_uri}
 docker tag ${algorithm_name}:latest ${fullname}
+
+aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${account}.dkr.ecr.${region}.amazonaws.com.cn
 
 docker push ${fullname}
