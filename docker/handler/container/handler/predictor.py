@@ -85,30 +85,59 @@ def transformation():
     “result”:[{“id”:5555,”score”:0.23},{“id”:3334,”score”:0.11}]
     }
     '''
-    userid=data['userid']
+    #
+    # 0.0 init (request session, and set retries to 3
+    #
+    s = requests.Session()
+    s.mount('http://', HTTPAdapter(max_retries=3))
+    s.mount('https://', HTTPAdapter(max_retries=3))
 
+    userid = data['userid']
+
+    #
+    # 0.1 exception process for 1 recall, return by 1 directly
+    #      
+    if len(data['recall']) == 1:
+        dict = {}
+        dict[data['recall'][0]["id"]] = 1.0
+
+        r = redis.StrictRedis(host=redis_url, port=redis_port, db=0)
+        result = r.zadd(userid, dict)
+        print("set to redis ",result)
+
+        response = {"result": result}
+        return flask.Response(response=json.dumps(response), status=200, mimetype='application/json')
+
+    #
+    # 1.1 build history info graph vector
+    #
     history = []
     for i in data['history']:
         print(i['title'])
         history.append(i['title'])
     print(history)
 
+    #
+    # 1.2 post history info graph vector
+    #
     #graph_url = 'http://54.87.130.9:8080/invocations'  #history urll ???
     header = {'Content-Type': 'application/json'}
     his_data = {"instance": history}
-    s = requests.Session()
-    s.mount('http://', HTTPAdapter(max_retries=3))
-    s.mount('https://', HTTPAdapter(max_retries=3))
-
     his_res = s.post(graph_url, data=json.dumps(his_data), headers=header, timeout=5)
     print(his_res.text)
 
+    #
+    # 2.1 build recall info graph vector
+    #  
     recall = []
     for i in data['recall']:
         print(i['title'])
         recall.append(i['title'])
     print(recall)
 
+    #
+    # 2.2 post recall info graph vector
+    #    
     #graph_url=graph_url='http://54.87.130.9:8080/invocations' #recall urll ???
     header = {'Content-Type': 'application/json'}
     recall_data = {"instance": recall}
@@ -120,6 +149,9 @@ def transformation():
     )
     print(recall_res.text)
 
+    #
+    # 3.1 build click_entities
+    #  
     his_res_data=json.loads(his_res.text)
     #build click_entities
     click_entities = []
@@ -131,7 +163,9 @@ def transformation():
 
     print(click_entities)
 
-    #build click_words
+    #
+    # 3.2 build click_words
+    #  
     click_words = []
     for i in his_res_data['result']:
         tmp=list(map(lambda x: x > 10061 and 10061 or x, i[0]))
@@ -140,6 +174,9 @@ def transformation():
         click_words.append([0]*16)        
     print(click_words)
 
+    #
+    # 3.3 build full vector with news_words/news_entities/click_words/click_entities
+    #  
     instances = []
     for i in json.loads(recall_res.text)['result']:
         news_words=list(map(lambda x: x > 10061 and 10061 or x, i[0]))
@@ -156,6 +193,9 @@ def transformation():
     dkn_data = {"signature_name": "serving_default", "instances": instances}
     print(dkn_data)
 
+    #
+    # 3.4 build full vector with news_words/news_entities/click_words/click_entities
+    # 
     #dkn_url='https://api.ireaderm.net/account/charge/info/android' #dkn urll ???
     header = {'Content-Type': 'application/json'}
     dkn_res = requests.post(dkn_url, 
@@ -165,15 +205,24 @@ def transformation():
     )
     print(dkn_res.text)
 
+    #
+    # 4.1 process results of dkn
+    # 
     dict = {}
     tmp = json.loads(dkn_res.text)
     for i in range(len(data['recall'])):
         dict[data['recall'][i]["id"]] = tmp['predictions'][i]
 
+    #
+    # 4.2 set to redis
+    # 
     r=redis.StrictRedis(host=redis_url,port=redis_port,db=0)
     result=r.zadd(userid,dict)
     print("set to redis ",result)
 
+    #
+    # 4.2 repsonse to http caller
+    # 
     response = {"result": result}
     return flask.Response(response=json.dumps(response), status=200, mimetype='application/json')
 

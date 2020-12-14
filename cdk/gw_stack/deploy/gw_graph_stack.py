@@ -178,7 +178,7 @@ class GWGraphStack(core.Stack):
             description = "Allow http inbound from VPC"
         )
 
-        return fargate_service
+        return fargate_service.load_balancer.load_balancer_dns_name
 
     def create_fagate_NLB_autoscaling_custom(self, vpc, **kwargs):
         ####################

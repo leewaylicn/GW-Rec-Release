@@ -36,7 +36,8 @@ class GWEcsHelper:
         return ecs_role 
 
     @staticmethod
-    def _create_fagate_queue_autoscaling(stack, vpc, image, name, ecs_role=None, env=None):
+    def _create_fagate_queue_autoscaling(stack, vpc, image, name, 
+            ecs_role=None, env=None, public_load_balancer=False):
         '''
         cluster = ecs.Cluster(
             stack, 
@@ -51,8 +52,8 @@ class GWEcsHelper:
             task = ecs.FargateTaskDefinition(
                 stack,
                 name+'-Task',
-                memory_limit_mib=512,
-                cpu=256,
+                memory_limit_mib=memory,
+                cpu=cpu,
                 execution_role=ecs_role, 
                 task_role=ecs_role
             )
@@ -60,8 +61,8 @@ class GWEcsHelper:
             task = ecs.FargateTaskDefinition(
                 stack,
                 name+'-Task',
-                memory_limit_mib=512,
-                cpu=256
+                memory_limit_mib=memory,
+                cpu=cpu
             )
 
         if env is None:
@@ -87,7 +88,9 @@ class GWEcsHelper:
         return "http://localhost"
 
     @staticmethod
-    def _create_fagate_ALB_autoscaling(stack, vpc, image, name, ecs_role=None, env=None, port=None, public_load_balancer=False):
+    def _create_fagate_ALB_autoscaling(stack, vpc, image, name, 
+            ecs_role=None, env=None, port=None, cpu=1024, memory=8192,
+            public_load_balancer=False):
         cluster = ecs.Cluster(
             stack, 
             name+'fargate-service-autoscaling', 
@@ -100,8 +103,8 @@ class GWEcsHelper:
             task = ecs.FargateTaskDefinition(
                 stack,
                 name+'-Task',
-                memory_limit_mib=512,
-                cpu=256,
+                memory_limit_mib=memory,
+                cpu=cpu,
                 execution_role=ecs_role, 
                 task_role=ecs_role
             )
@@ -109,8 +112,8 @@ class GWEcsHelper:
             task = ecs.FargateTaskDefinition(
                 stack,
                 name+'-Task',
-                memory_limit_mib=512,
-                cpu=256
+                memory_limit_mib=memory,
+                cpu=cpu
             )
 
         if env is None:
