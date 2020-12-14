@@ -41,7 +41,7 @@ class GWRedisHelper:
                 cache_node_type="cache.t2.small",
                 replicas_per_node_group=1,
                 num_node_groups=3,
-                replication_group_description="redis-gw",
+                replication_group_description="redis-gw-test",
                 automatic_failover_enabled=True,
                 security_group_ids=[redis_security_group.security_group_id],
                 cache_subnet_group_name=subnetGroup.cache_subnet_group_name
@@ -54,7 +54,7 @@ class GWRedisHelper:
                 engine="redis",
                 cache_node_type="cache.t2.small",
                 num_cache_nodes=1,
-                cluster_name="redis-gw",
+                cluster_name="redis-gw-test",
                 vpc_security_group_ids=[redis_security_group.security_group_id],
                 cache_subnet_group_name=subnetGroup.cache_subnet_group_name
             )

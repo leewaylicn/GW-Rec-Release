@@ -92,8 +92,8 @@ RUN pip3 install --no-cache-dir redis
 # RUN pip3 install --no-cache-dir fastHan
 RUN pip3 install --no-cache-dir marisa_trie
 RUN pip3 install --no-cache-dir dgl==0.4.3.post2
-RUN pip3 install -e git+http://git@github.com/xiaotinghe/fastHan.git'#egg=fastHan'
-RUN pip3 install -e git+http://git@github.com/xiaotinghe/dgl-ke.git'#egg=dglke&subdirectory=python'
+#RUN pip3 install -e git+http://git@github.com/xiaotinghe/fastHan.git'#egg=fastHan'
+#RUN pip3 install -e git+http://git@github.com/xiaotinghe/dgl-ke.git'#egg=dglke&subdirectory=python'
 
 RUN rm -rf /root/.cache
 
