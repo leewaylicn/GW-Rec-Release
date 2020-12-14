@@ -1,7 +1,9 @@
 from aws_cdk import (core, aws_ec2 as ec2, aws_ecs as ecs, aws_ecs_patterns as
                      ecs_patterns, aws_elasticache as ec, aws_rds as rds, aws_lambda as _lambda,
-                     aws_s3 as s3, aws_lambda_event_sources as lambda_event_source, aws_iam as iam)
+                     aws_s3 as s3, aws_lambda_event_sources as lambda_event_source, aws_iam as iam,
+                     aws_autoscaling as autoscaling)
 
+from cdk_fargate_run_task import RunTask
 
 class GWEcsHelper:
 
@@ -33,7 +35,59 @@ class GWEcsHelper:
 
         return ecs_role 
 
-    def create_fagate_ALB_autoscaling(stack, vpc, image, name, ecs_role=None, env=None, port=None, public_load_balancer=False):
+    @staticmethod
+    def _create_fagate_queue_autoscaling(stack, vpc, image, name, ecs_role=None, env=None):
+        '''
+        cluster = ecs.Cluster(
+            stack, 
+            name+'fargate-service-autoscaling', 
+            vpc=vpc
+        )
+        '''
+
+        ecs_log = ecs.LogDrivers.aws_logs(stream_prefix=name)
+
+        if ecs_role is not None:
+            task = ecs.FargateTaskDefinition(
+                stack,
+                name+'-Task',
+                memory_limit_mib=512,
+                cpu=256,
+                execution_role=ecs_role, 
+                task_role=ecs_role
+            )
+        else:
+            task = ecs.FargateTaskDefinition(
+                stack,
+                name+'-Task',
+                memory_limit_mib=512,
+                cpu=256
+            )
+
+        if env is None:
+            env = {"test": "test"}
+
+
+        task.add_container(
+                name+'-Contaner',
+                image=ecs.ContainerImage.from_registry(image),
+                logging=ecs_log,
+                environment=env
+        )
+
+        '''
+        cluster.add_capacity(image,
+                instance_type=ec2.InstanceType("t2.micro")
+        )
+        '''
+
+        # deploy and run this task once
+        run_task_at_once = RunTask(stack, name, task=task)
+
+        return "http://localhost"
+
+    @staticmethod
+    def _create_fagate_ALB_autoscaling(stack, vpc, image, name, ecs_role=None, env=None, port=None, public_load_balancer=False):
         cluster = ecs.Cluster(
             stack, 
             name+'fargate-service-autoscaling', 
@@ -130,4 +184,20 @@ class GWEcsHelper:
         
         return fargate_service.load_balancer.load_balancer_dns_name
 
+    @staticmethod
+    def create_fagate_ALB_autoscaling(stack, vpc, image, name, ecs_role=None, env=None, port=None, public_load_balancer=False):
     
+        if port is not None:
+            url=GWEcsHelper._create_fagate_ALB_autoscaling(stack, vpc, image, name, 
+                ecs_role=ecs_role, 
+                env=env, 
+                port=port,
+                public_load_balancer=public_load_balancer
+            )
+        else:
+            url=GWEcsHelper._create_fagate_queue_autoscaling(stack, vpc, image, name, 
+                ecs_role=ecs_role, 
+                env=env
+            )
+        
+        return url

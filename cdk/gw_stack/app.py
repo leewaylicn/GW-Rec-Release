@@ -31,12 +31,12 @@ app = core.App()
 
 infra_stack = CdkInfraStack(
                 app, 
-                "cdk-stack-infer-infra"
+                "cdk-stack-infer-infra-test"
             )
 
 sample_stack = GWSampleStack(
                 app, 
-                "cdk-stack-infer-Sample", 
+                "cdk-stack-liwei-sample", 
                 infra_stack.vpc, 
                 ecs_role = infra_stack.ecs_role
             )
@@ -61,7 +61,9 @@ infer_handler_stack = GWInferHandlerStack(
                         infra_stack.vpc, 
                         ecs_role=infra_stack.ecs_role,
                         graph_url=graph_stack.graph_inference_dns, 
-                        dkn_url=dkn_stack.url+":8501"
+                        dkn_url=dkn_stack.url+":8501",
+                        redis_host=infra_stack.redis_addr, 
+                        redis_port=infra_stack.redis_port
                     )
 
 gw_loginto_stack = GWLogintoStack(

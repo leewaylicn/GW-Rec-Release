@@ -38,7 +38,7 @@ class CdkInfraStack(core.Stack):
         #core.CfnOutput(self, 'vpcId', value=self.vpc.vpc_id, export_name='ExportedVpcId')
 
         #create redis
-        self.redis_addr, self.redis_port = GWRedisHelper.create_redis(self, self.vpc, is_group=True)
+        self.redis_addr, self.redis_port = GWRedisHelper.create_redis(self, self.vpc, is_group=False)
 
         #create ecs role
         self.ecs_role = GWIAMHelper.create_ecs_role(self)
