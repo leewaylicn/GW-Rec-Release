@@ -3,7 +3,7 @@ from aws_cdk import (core, aws_ec2 as ec2, aws_ecs as ecs, aws_ecs_patterns as
                      aws_s3 as s3, aws_lambda_event_sources as lambda_event_source, aws_iam as iam,
                      aws_autoscaling as autoscaling)
 
-from cdk_fargate_run_task import RunTask
+# from cdk_fargate_run_task import RunTask
 
 class GWEcsHelper:
 

@@ -10,15 +10,21 @@ import traceback
 import numpy as np
 
 import flask
-
 import pandas as pd
+import kg
+import encoding
 
 prefix = '/opt/ml/'
 model_path = os.path.join(prefix, 'model')
 
-kg_path = os.environ['KG_PATH']
-input_bucket_name = os.environ['INPUT_BUCKET_NAME']
-output_bucket_name = os.environ['OUTPUT_BUCKET_NAME']
+kg_path = os.environ['GRAPH_BUCKET']
+dbpedia_key = os.environ['KG_DBPEDIA_KEY']
+entity_key = os.environ['KG_ENTITY_KEY']
+relation_key = os.environ['KG_RELATION_KEY']
+entity_industry_key = os.environ['KG_ENTITY_INDUSTRY_KEY']
+vocab_key = os.environ['KG_VOCAB_KEY']
+data_input_key = os.environ['DATA_INPUT_KEY']
+train_output_key = os.environ['TRAIN_OUTPUT_KEY']
 
 # graph = kg.Kg('kg')
 # model = encoding.encoding(graph)
@@ -27,10 +33,18 @@ output_bucket_name = os.environ['OUTPUT_BUCKET_NAME']
 # It has a predict function that does a prediction based on the model and the input data.
 
 class ScoringService(object):
-    import kg
-    import encoding
-    graph = kg.Kg(kg_path, input_bucket_name, output_bucket_name) # Where we keep the model when it's loaded
-    model = encoding.encoding(graph,input_bucket_name)
+    env = {
+        'GRAPH_BUCKET': kg_path,
+        'KG_DBPEDIA_KEY': dbpedia_key,
+        'KG_ENTITY_KEY': entity_key,
+        'KG_RELATION_KEY': relation_key,
+        'KG_ENTITY_INDUSTRY_KEY': entity_industry_key,
+        'KG_VOCAB_KEY': vocab_key,
+        'DATA_INPUT_KEY': data_input_key,
+        'TRAIN_OUTPUT_KEY': train_output_key
+    }
+    graph = kg.Kg(kg_path, env) # Where we keep the model when it's loaded
+    model = encoding.encoding(graph, env)
 
     @classmethod
     def get_model(cls):

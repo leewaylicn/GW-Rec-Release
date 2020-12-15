@@ -25,8 +25,8 @@ class GWGraphStack(core.Stack):
 
        # vpc = ec2.Vpc(self, "GWVpc", max_azs=3)     # default is all AZs in region
 
-        graph_train_image = '856419311962.dkr.ecr.us-east-1.amazonaws.com/gw-graph-train:latest'
-        graph_infer_image = '856419311962.dkr.ecr.us-east-1.amazonaws.com/gw-graph-infer:latest'
+        graph_train_image = '856419311962.dkr.ecr.cn-northwest-1.amazonaws.com.cn/gw-graph-train:latest'
+        graph_infer_image = '856419311962.dkr.ecr.cn-northwest-1.amazonaws.com.cn/gw-graph-infer:latest'
 
         cfg_dict = {}
         cfg_dict['vpc'] = vpc
@@ -52,10 +52,10 @@ class GWGraphStack(core.Stack):
         #Create NLB autoscaling
         #self.create_fagate_NLB_autoscaling(vpc)
 
-        cfg_dict = {}
-        cfg_dict['function'] = 'graph_inference'
-        cfg_dict['ecr'] = 'sagemaker-recsys-graph-inference'
-        cfg_dict['ecs_role'] = GWAppHelper.create_ecs_role(self)
+        # cfg_dict = {}
+        # cfg_dict['function'] = 'graph_inference'
+        # cfg_dict['ecr'] = 'sagemaker-recsys-graph-inference'
+        # cfg_dict['ecs_role'] = GWAppHelper.create_ecs_role(self)
         # self.graph_inference_dns = self.create_fagate_NLB_autoscaling_custom(vpc, **cfg_dict)
 
         # dkn_train_input = 
@@ -67,9 +67,14 @@ class GWGraphStack(core.Stack):
         env = {
             # "MODEL_S3_KEY":"s3://rp-gw/dkn/model/model.tar.gz",
             # "MODEL_S3_KEY":"s3://rp-gw-1/dkn_model/dkn-2020-12-03-11-53-53-391/output/model.tar.gz"
-            "KG_PATH": "s3://rp-gw/graph/model/",
-            "INPUT_BUCKET_NAME": "s3://rp-gw/graph/input/",
-            "OUTPUT_BUCKET_NAME": "s3://rp-gw/graph/output/"
+            "GRAPH_BUCKET": "recommend-gw",
+            "KG_DBPEDIA_KEY": "model/kg_dbpedia.txt",
+            "KG_ENTITY_KEY": "model/entities_dbpedia.dict",
+            "KG_RELATION_KEY": "model/relations_dbpedia.dict",
+            "KG_ENTITY_INDUSTRY_KEY": "model/entity_industry.txt",
+            "KG_VOCAB_KEY": "model/vocab.json",
+            "DATA_INPUT_KEY": "data/input",
+            "TRAIN_OUTPUT_KEY": "train/output"
         }
 
         self.url = GWEcsHelper.create_fagate_ALB_autoscaling(

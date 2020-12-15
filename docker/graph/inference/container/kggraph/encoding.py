@@ -2,6 +2,7 @@ import boto3
 import numpy as np
 import json
 import re
+import os
 import sys
 print("sys path is {}".format(sys.path))
 from fastHan import FastHan
@@ -10,15 +11,32 @@ s3client = boto3.client('s3')
 # Bucket = 'autorec-1'
 
 class Vocab:
-    def __init__(self, Bucket, vocab_file = None):
+    def __init__(self, Bucket, vocab_key, vocab_file = None):
         self.token_to_idx = {}
+        if not os.path.exists(Bucket):
+            os.makedirs(Bucket)
         if vocab_file == None:
-            s3client.download_file(Bucket, 'vocab.json', 'vocab.json')
-            vocab_file = 'vocab.json'
+            if not os.path.exists(vocab_key):
+                check_parent_dir(Bucket, vocab_file)
+                s3client.download_file(Bucket, vocab_key, os.path.join(Bucket, vocab_key))
+            vocab_file = os.path.join(Bucket, vocab_key)
+        # if vocab_file == None:
+        #     s3client.download_file(Bucket, 'vocab.json', 'vocab.json')
+        #     vocab_file = 'vocab.json'
         self.idx_to_token = ['<unk>'] + json.load(open(vocab_file,'r'))
         for i, token in enumerate(self.idx_to_token):
             self.token_to_idx[token] = i
         self.unk = 0
+    def check_parent_dir(self, current_parent, complete_dir):
+        dir_split = complete_dir.split('/')
+        if len(dir_split) == 1:
+            if len(dir_split[0].split('.')) == 1:
+                os.makedirs(os.path.join(current_parent,dir_split[0]))
+            return
+        else:
+            if not os.path.exists(os.path.join(current_parent,dir_split[0])):
+                os.makedirs(os.path.join(current_parent,dir_split[0]))
+            check_parent_dir(dir_split[0], '/'.join(dir_split[1:]))
     def __len__(self):
         return len(self.idx_to_token)
 
@@ -33,12 +51,13 @@ class Vocab:
         return [self.idx_to_token[index] for index in indices]
     
 class encoding:
-    def __init__(self, kg, input_bucket, output_bucket=None):
+    # def __init__(self, kg, input_bucket, output_bucket=None):
+    def __init__(self, kg, env):
         self.kg = kg
-        self.input_bucket = input_bucket
-        self.output_bucket = output_bucket
+        # self.input_bucket = input_bucket
+        # self.output_bucket = output_bucket
         self.trie = marisa_trie.Trie(list(kg.entity_industry))
-        self.vocab = Vocab(self.input_bucket)
+        self.vocab = Vocab(env['GRAPH_BUCKET'], env['KG_VOCAB_KEY'])
         self.model=FastHan()
     def __getitem__(self, text):
         seg, ner_gen, ner_indu = self.word_parser(text)
