@@ -25,8 +25,8 @@ class GWGraphStack(core.Stack):
 
        # vpc = ec2.Vpc(self, "GWVpc", max_azs=3)     # default is all AZs in region
 
-        graph_train_image = '856419311962.dkr.ecr.us-east-1.amazonaws.com/sagemaker-recsys-graph-train'
-        graph_infer_image = '856419311962.dkr.ecr.us-east-1.amazonaws.com/sagemaker-recsys-graph-infer'
+        graph_train_image = '856419311962.dkr.ecr.us-east-1.amazonaws.com/gw-graph-train:latest'
+        graph_infer_image = '856419311962.dkr.ecr.us-east-1.amazonaws.com/gw-graph-infer:latest'
 
         cfg_dict = {}
         cfg_dict['vpc'] = vpc
@@ -58,7 +58,6 @@ class GWGraphStack(core.Stack):
         cfg_dict['ecs_role'] = GWAppHelper.create_ecs_role(self)
         # self.graph_inference_dns = self.create_fagate_NLB_autoscaling_custom(vpc, **cfg_dict)
 
-        graph_infer_image = "856419311962.dkr.ecr.cn-north-1.amazonaws.com.cn/gw-infer:latest"
         # dkn_train_input = 
         # dkn_test_input = 
         # dkn_model_output = 

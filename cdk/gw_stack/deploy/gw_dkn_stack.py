@@ -11,7 +11,7 @@ class GWDknStack(core.Stack):
             vpc: ec2.Vpc, ecs_role: iam.Role,  **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
         
-        dkn_infer_image = "856419311962.dkr.ecr.cn-north-1.amazonaws.com.cn/gw-infer:latest"
+        dkn_infer_image = "856419311962.dkr.ecr.cn-north-1.amazonaws.com.cn/gw-dkn-infer:latest"
         dkn_train_image = "856419311962.dkr.ecr.cn-north-1.amazonaws.com.cn/gw-dkn-train:latest"
         # dkn_train_input = 
         # dkn_test_input = 
