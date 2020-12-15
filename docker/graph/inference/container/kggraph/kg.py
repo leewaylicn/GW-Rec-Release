@@ -122,5 +122,7 @@ class Kg:
                   '--format','udd_hrt',
                   '--data_files','entities_dbpedia.dict','relations_dbpedia.dict','kg_dbpedia.txt',
                   '--neg_sample_size_eval','10000'])
+        print("finish training!!")
         if self.output_bucket != None:
+            print("upload to {}".format(self.output_bucket))
             s3client.upload_file(kg_folder + '/*.npy', self.output_bucket)

@@ -28,6 +28,10 @@ import sys
 import subprocess
 import traceback
 
+kg_path = os.environ['KG_PATH']
+input_bucket_name = os.environ['INPUT_BUCKET_NAME']
+output_bucket_name = os.environ['OUTPUT_BUCKET_NAME']
+
 # These are the paths to where SageMaker mounts interesting things in your container.
 prefix = '/opt/ml/'
 input_path = os.path.join(prefix,'input/data')
@@ -86,7 +90,8 @@ if __name__ == '__main__':
 
         # _run(train_cmd)
 
-        kg = kg.Kg('kg')
+        # kg = kg.Kg('kg')
+        kg = kg.Kg(kg_path, input_bucket_name, output_bucket_name) # Where we keep the model when it's loaded
         kg.train(max_step=200)
 
         print('Training complete.')
