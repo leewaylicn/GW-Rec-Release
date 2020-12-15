@@ -90,7 +90,7 @@ RUN pip3 install --no-cache-dir flask
 RUN pip3 install --no-cache-dir gevent
 RUN pip3 install --no-cache-dir gunicorn
 # RUN pip3 install --no-cache-dir fastHan
-RUN pip3 instal --no-cache-dir marisa_trie
+RUN pip3 install --no-cache-dir marisa_trie
 RUN pip3 install --no-cache-dir dgl==0.4.3.post2
 # RUN pip3 install -e git+http://git@github.com/xiaotinghe/fastHan.git'#egg=fastHan'
 RUN pip3 install -e git+https://github.com/fastnlp/fastHan.git'#egg=fastHan'

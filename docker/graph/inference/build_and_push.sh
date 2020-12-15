@@ -6,7 +6,7 @@ algorithm_name=gw-graph-infer
 
 cd container
 
-chmod +x kggraph/train
+# chmod +x kggraph/train
 chmod +x kggraph/serve
 
 account=$(aws sts get-caller-identity --query Account --output text)
