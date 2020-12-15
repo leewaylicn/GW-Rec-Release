@@ -3,7 +3,7 @@
 ACCOUNT_ID=`aws sts get-caller-identity --query Account --output text`
 #REGION=`curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/'`
 REGION=$(aws configure get region)
-REPO_NAME=gw-infer
+REPO_NAME=gw-dkn-infer
 
 #TAG=`date '+%Y%m%d%H%M%S'`
 TAG="latest"

@@ -2,7 +2,7 @@
 #%%sh
 
 # The name of our algorithm
-algorithm_name=sagemaker-recsys-graph-inference
+algorithm_name=gw-graph-infer
 
 cd container
 
