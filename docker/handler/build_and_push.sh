@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # The name of our algorithm
-algorithm_name=recsys-graph-dkn-inference
+algorithm_name=recsys-handler-inference
 
 cd container
 
