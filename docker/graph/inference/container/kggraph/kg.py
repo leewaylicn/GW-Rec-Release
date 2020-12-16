@@ -9,7 +9,7 @@ s3client = boto3.client('s3')
 class Kg:
     #def __init__(self, kg_folder=None, input_bucket=None, output_bucket=None):
     def __init__(self, env=None):
-        load_path(env)
+        self.load_path(env)
         self.entity_to_idx = {} # 记录全部实体（通用+行业）
         self.idx_to_entity = []
         self.relation_to_idx = {}
