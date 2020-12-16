@@ -36,16 +36,16 @@ class Kg:
         else:
             if not os.path.exists(os.path.join(current_parent,dir_split[0])):
                 os.makedirs(os.path.join(current_parent,dir_split[0]))
-            check_parent_dir(dir_split[0], '/'.join(dir_split[1:]))
+            self.check_parent_dir(dir_split[0], '/'.join(dir_split[1:]))
     def load_file(self):
         # 加载实体列表
         if not os.path.exists(self.kg_folder):
             os.makedirs(self.kg_folder)
         if not os.path.exists(self.kg_dbpedia_key):
-            check_parent_dir(self.kg_folder, self.kg_dbpedia_key)
+            self.check_parent_dir(self.kg_folder, self.kg_dbpedia_key)
             s3client.download_file(self.kg_folder, self.kg_dbpedia_key, os.path.join(self.kg_folder ,self.kg_dbpedia_key))
         if not os.path.exists(self.kg_entity_key):
-            check_parent_dir(self.kg_folder, self.kg_entity_key)
+            self.check_parent_dir(self.kg_folder, self.kg_entity_key)
             s3client.download_file(self.kg_folder, self.kg_entity_key, os.path.join(self.kg_folder ,self.kg_entity_key))
         entities = pd.read_csv(os.path.join(self.kg_folder, self.kg_entity_key), header=None)
         for r in zip(entities[0], entities[1]):
@@ -53,7 +53,7 @@ class Kg:
             self.idx_to_entity.append(str(r[1]).strip())
         # 加载关系三元组
         if not os.path.exists(self.kg_relation_key):
-            check_parent_dir(self.kg_folder, self.kg_relation_key)
+            self.check_parent_dir(self.kg_folder, self.kg_relation_key)
             s3client.download_file(self.kg_folder, self.kg_relation_key, os.path.join(self.kg_folder ,self.kg_relation_key))
         relations = pd.read_csv(os.path.join(self.kg_folder, self.kg_relation_key), header=None)
         for r in zip(relations[0], relations[1]):
@@ -61,7 +61,7 @@ class Kg:
             self.idx_to_relation.append(str(r[1]).strip())
         # 加载行业专属实体列表
         if not os.path.exists(self.kg_entity_industry_key):
-            check_parent_dir(self.kg_folder, self.kg_entity_industry_key)
+            self.check_parent_dir(self.kg_folder, self.kg_entity_industry_key)
             s3client.download_file(self.kg_folder, self.kg_entity_industry_key, os.path.join(self.kg_folder ,self.kg_entity_industry_key))
         with open(os.path.join(self.kg_folder, self.kg_entity_industry_key), 'r') as f:
             for word in f:
@@ -148,7 +148,7 @@ class Kg:
                 f.write(k)
 #     def train(self, output_dir = 'kg_embedding', hidden_dim=128, max_step=320000):
     def train(self, output_dir = '/opt/ml/model', hidden_dim=128, max_step=320000):
-        check_parent_dir('.',self.train_output_key)
+        self.check_parent_dir('.',self.train_output_key)
         dglke_train.main(['--dataset',self.kg_folder,
                   #'--model_name','RotatE'
                   '--gamma','19.9',
