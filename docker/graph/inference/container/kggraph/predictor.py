@@ -43,7 +43,7 @@ class ScoringService(object):
         'DATA_INPUT_KEY': data_input_key,
         'TRAIN_OUTPUT_KEY': train_output_key
     }
-    graph = kg.Kg(kg_path, env) # Where we keep the model when it's loaded
+    graph = kg.Kg(env) # Where we keep the model when it's loaded
     model = encoding.encoding(graph, env)
 
     @classmethod

@@ -107,7 +107,7 @@ if __name__ == '__main__':
             'DATA_INPUT_KEY': data_input_key,
             'TRAIN_OUTPUT_KEY': train_output_key
         }
-        graph = kg.Kg(kg_path, env) # Where we keep the model when it's loaded
+        graph = kg.Kg(env) # Where we keep the model when it's loaded
         graph.train(max_step=200)
 
         print('Training complete.')
