@@ -17,7 +17,7 @@ class Vocab:
             os.makedirs(Bucket)
         if vocab_file == None:
             if not os.path.exists(vocab_key):
-                self.check_parent_dir(Bucket, vocab_file)
+                self.check_parent_dir(Bucket, vocab_key)
                 s3client.download_file(Bucket, vocab_key, os.path.join(Bucket, vocab_key))
             vocab_file = os.path.join(Bucket, vocab_key)
         # if vocab_file == None:
