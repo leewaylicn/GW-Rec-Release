@@ -17,7 +17,7 @@ class Vocab:
             os.makedirs(Bucket)
         if vocab_file == None:
             if not os.path.exists(vocab_key):
-                check_parent_dir(Bucket, vocab_file)
+                self.check_parent_dir(Bucket, vocab_file)
                 s3client.download_file(Bucket, vocab_key, os.path.join(Bucket, vocab_key))
             vocab_file = os.path.join(Bucket, vocab_key)
         # if vocab_file == None:
@@ -36,7 +36,7 @@ class Vocab:
         else:
             if not os.path.exists(os.path.join(current_parent,dir_split[0])):
                 os.makedirs(os.path.join(current_parent,dir_split[0]))
-            check_parent_dir(dir_split[0], '/'.join(dir_split[1:]))
+            self.check_parent_dir(dir_split[0], '/'.join(dir_split[1:]))
     def __len__(self):
         return len(self.idx_to_token)
 
