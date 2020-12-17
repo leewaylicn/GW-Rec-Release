@@ -37,7 +37,7 @@ class GWEcsHelper:
 
     @staticmethod
     def _create_fagate_queue_autoscaling(stack, vpc, image, name, 
-            ecs_role=None, env=None, public_load_balancer=False):
+            ecs_role=None, env=None, public_load_balancer=False, gpu_count=None):
 
         cluster = ecs.Cluster(
             stack, 
