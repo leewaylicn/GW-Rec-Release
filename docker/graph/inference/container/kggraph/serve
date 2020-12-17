@@ -55,7 +55,7 @@ def start_server_tf():
     # SageMaker copies our model artifact from our Training Job into the /opt/ml/model.
     # https://docs.aws.amazon.com/sagemaker/latest/dg/your-algorithms-inference-code.html#your-algorithms-inference-code-load-artifacts
     tf_model_server = subprocess.call(['tensorflow_model_server',
-                                       '--rest_api_port=8501',
+                                       '--rest_api_port=8888',
                                        '--model_name=cifar10_model',
                                        '--model_base_path=/opt/ml/model/export/Servo'])
 
