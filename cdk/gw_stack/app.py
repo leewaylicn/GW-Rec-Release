@@ -77,13 +77,13 @@ infer_handler_stack = GWInferHandlerStack(
                         redis_port=infra_stack.redis_port
                     )
 
-gw_loginto_stack = GWLogintoStack(
-                        app, 
-                        "cdk-stack-loginto", 
-                        infra_stack.vpc, 
-                        ecs_role=infra_stack.ecs_role,
-                        redis_host=infra_stack.redis_addr, 
-                        redis_port=infra_stack.redis_port
-                    )
+# gw_loginto_stack = GWLogintoStack(
+#                         app, 
+#                         "cdk-stack-loginto", 
+#                         infra_stack.vpc, 
+#                         ecs_role=infra_stack.ecs_role,
+#                         redis_host=infra_stack.redis_addr, 
+#                         redis_port=infra_stack.redis_port
+#                     )
 
 app.synth()

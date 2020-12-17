@@ -1,18 +1,18 @@
 curl --request POST \
-  --url http://cdk-s-Infer-10FFU2R2FA08L-4399fb6cd9948720.elb.cn-north-1.amazonaws.com.cn:8080/invocations \
+  --url http://cdk-s-Infer-1XDK02SAH0LYL-3ac05461877d5780.elb.cn-northwest-1.amazonaws.com.cn:8080/invocations \
   --header 'Content-Type: application/json' \
   --data '{"recall": [{"id":1234,"title":"中国银行"},{"id":3434,"title":"中兴进入美国市场"}], "history":  [{"id":1234,"title":"中国银行"},{"id":3434,"title":"中兴进入美国市场"}], "userid": "1545128ada" }'
 
 
 curl --request POST \
-  --url http://cdk-s-graph-1NRHSO0NG5U3A-5294be9b463dbb64.elb.cn-north-1.amazonaws.com.cn/invocations \
+  --url http://cdk-s-Infer-1XDK02SAH0LYL-3ac05461877d5780.elb.cn-northwest-1.amazonaws.com.cn/invocations \
   --header 'Content-Type: application/json' \
   --data '{"instance": ["中国银行", "中兴进入美国市场"], "userid": "1545128ada" }'
  
 
 
  curl --request POST \
-  --url http://cdk-s-DKNin-D8NOQ42GUAXW-70be61e696a03b30.elb.cn-north-1.amazonaws.com.cn:8501/v1/models/dkn:predict \
+  --url http://cdk-s-DKNin-1CDYKS6RWMBM9-c5d8f9ef79a9af72.elb.cn-northwest-1.amazonaws.com.cn:8501/v1/models/dkn:predict \
   --header 'Content-Type: application/json' \
   --data '{"signature_name": "serving_default", "instances": [{"news_words": [21, 327, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "news_entities": [2814, 2814, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "click_words": [[21, 327, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [21, 327, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], "click_entities": [[2814, 2814, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [2814, 2814, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]}, {"news_words": [21, 327, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "news_entities": [2814, 2814, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "click_words": [[21, 327, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [21, 327, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], "click_entities": [[2814, 2814, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [2814, 2814, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]}]}'
 
