@@ -1,11 +1,11 @@
 curl --request POST \
-  --url http://cdk-s-Infer-1XDK02SAH0LYL-3ac05461877d5780.elb.cn-northwest-1.amazonaws.com.cn:8080/invocations \
+  --url http://cdk-s-Infer-GOLCT3EPK4QT-3c2540ba0038e938.elb.cn-northwest-1.amazonaws.com.cn:8080/invocations \
   --header 'Content-Type: application/json' \
   --data '{"recall": [{"id":1234,"title":"中国银行"},{"id":3434,"title":"中兴进入美国市场"}], "history":  [{"id":1234,"title":"中国银行"},{"id":3434,"title":"中兴进入美国市场"}], "userid": "1545128ada" }'
 
 
 curl --request POST \
-  --url http://cdk-s-Infer-1XDK02SAH0LYL-3ac05461877d5780.elb.cn-northwest-1.amazonaws.com.cn/invocations \
+  --url http://cdk-s-Infer-GOLCT3EPK4QT-3c2540ba0038e938.elb.cn-northwest-1.amazonaws.com.cn/invocations \
   --header 'Content-Type: application/json' \
   --data '{"instance": ["中国银行", "中兴进入美国市场"], "userid": "1545128ada" }'
  

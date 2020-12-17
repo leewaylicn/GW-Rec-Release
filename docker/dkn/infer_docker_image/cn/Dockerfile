@@ -1,7 +1,10 @@
 FROM python:3.7.9-slim
 RUN pip install boto3
 
-FROM tensorflow/serving
+# FROM tensorflow/serving
+# tensorflow-inference:1.15.4-gpu-py36-cu100-ubuntu18.04
+ARG REGISTRY_URI
+FROM ${REGISTRY_URI}/tensorflow-inference:1.15.4-gpu-py36-cu100-ubuntu18.04
 COPY --from=0 / /
 
 ADD ./serve_model.py /usr/bin
