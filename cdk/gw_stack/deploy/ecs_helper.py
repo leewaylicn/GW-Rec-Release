@@ -60,7 +60,6 @@ class GWEcsHelper:
             task = ecs.FargateTaskDefinition(
                 stack,
                 name+'-Task',
-                desired_count=1,
                 memory_limit_mib=memory,
                 cpu=cpu
             )

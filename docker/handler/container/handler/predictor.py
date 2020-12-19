@@ -105,7 +105,14 @@ def transformation():
         result = r.zadd(userid, dict)
         print("set to redis ",result)
 
-        response = {"result": result}
+        results = []
+        result = {
+            "id": data['recall'][0]["id"],
+            "score": 1
+        }
+        results.append(result)
+
+        response = {"result": results}
         return flask.Response(response=json.dumps(response), status=200, mimetype='application/json')
 
     #
@@ -221,12 +228,13 @@ def transformation():
     print("set to redis ",result)
 
     #
-    # 4.2 repsonse to http caller
+    # 4.3 repsonse to http caller
     # 
+    '''
     response = {"result": result}
     return flask.Response(response=json.dumps(response), status=200, mimetype='application/json')
+    '''
 
-"""
     results = []
     tmp = json.loads(dkn_res.text)
     for i in range(len(data['recall'])):
@@ -238,4 +246,4 @@ def transformation():
     response = {"result": results}
 
     return flask.Response(response=json.dumps(response), status=200, mimetype='application/json')
-"""
+
