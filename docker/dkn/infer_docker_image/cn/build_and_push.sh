@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
-# 这个账号指的是想把 build 出来的 image 放到哪个 账号的 ECR 下，也就是当前使用者的account，跟 aws sts get-caller-identity 返回的 account 一致
-ACCOUNT_ID=`aws sts get-caller-identity --query Account --output text`
-#REGION=`curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/'`
+# account_id和region是对应最后要push的ECR
+account_id=`aws sts get-caller-identity --query Account --output text`
 region=$(aws configure get region)
-REGION=$(aws configure get region)
-REPO_NAME=gw-dkn-infer
+# repo 相关信息
+repo_name=gw-dkn-infer
+#tag=`date '+%Y%m%d%H%M%S'`
+tag="latest"
 
-#TAG=`date '+%Y%m%d%H%M%S'`
-TAG="latest"
-
-# docker pull tensorflow/serving
-
+# 基础镜像相关的account_id以及ecr的地址
 if [[ $region =~ ^cn.* ]]
 then
     registry_id="727897471807"
@@ -20,14 +17,19 @@ else
     registry_uri="${registry_id}.dkr.ecr.${region}.amazonaws.com"
 fi
 
+# login 到基础镜像的ecr
 aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${registry_uri}
 
-docker build -t $REPO_NAME . --build-arg REGISTRY_URI=${registry_uri}
+# build image
+docker build -t $repo_name . --build-arg REGISTRY_URI=${registry_uri}
 
-docker tag $REPO_NAME $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com.cn/$REPO_NAME:${TAG}
+# 打tag
+docker tag $repo_name $account_id.dkr.ecr.$region.amazonaws.com.cn/$repo_name:${tag}
 
-aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com.cn
-# $(aws ecr get-login-password --region ${REGION}) 
-aws ecr describe-repositories --repository-names $REPO_NAME || aws ecr create-repository --repository-name $REPO_NAME
+# login 到自己的ecr
+aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${account_id}.dkr.ecr.${region}.amazonaws.com.cn
+# 判断自己的账户下有没有相应的repo
+aws ecr describe-repositories --repository-names $repo_name || aws ecr create-repository --repository-name $repo_name
 
-docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com.cn/$REPO_NAME:${TAG}
+# push repo
+docker push $account_id.dkr.ecr.$region.amazonaws.com.cn/$repo_name:${tag}
