@@ -25,8 +25,8 @@ class GWGraphStack(core.Stack):
 
        # vpc = ec2.Vpc(self, "GWVpc", max_azs=3)     # default is all AZs in region
 
-        graph_train_image = '856419311962.dkr.ecr.cn-northwest-1.amazonaws.com.cn/gw-graph-train:latest'
-        graph_infer_image = '856419311962.dkr.ecr.cn-northwest-1.amazonaws.com.cn/gw-graph-infer:latest'
+        graph_train_image = '856419311962.dkr.ecr.cn-north-1.amazonaws.com.cn/gw-graph-train:latest'
+        graph_infer_image = '856419311962.dkr.ecr.cn-north-1.amazonaws.com.cn/gw-graph-infer:latest'
 
         cfg_dict = {}
         cfg_dict['vpc'] = vpc
