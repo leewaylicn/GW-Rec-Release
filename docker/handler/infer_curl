@@ -1,5 +1,5 @@
 curl --request POST \
-  --url http://cdk-s-Infer-GOLCT3EPK4QT-3c2540ba0038e938.elb.cn-northwest-1.amazonaws.com.cn:8080/invocations \
+  --url http://cdk-s-Infer-Q0GXKY6PQ4XU-956abff350d737fc.elb.cn-north-1.amazonaws.com.cn:8080/invocations \
   --header 'Content-Type: application/json' \
   --data '{"recall": [{"id":1234,"title":"中国银行"},{"id":3434,"title":"中兴进入美国市场"}], "history":  [{"id":1234,"title":"中国银行"},{"id":3434,"title":"中兴进入美国市场"}], "userid": "1545128ada" }'
 

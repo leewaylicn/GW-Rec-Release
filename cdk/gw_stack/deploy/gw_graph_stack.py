@@ -63,8 +63,8 @@ class GWGraphStack(core.Stack):
         # dkn_model_output = 
         # image = "233121040379.dkr.ecr.cn-northwest-1.amazonaws.com.cn/gw-infer:latest"
         name = "graph-inference"
-        # port = 8080
-        port = 8501
+        port = 8080
+        # port = 8501
         env = {
             # "MODEL_S3_KEY":"s3://rp-gw/dkn/model/model.tar.gz",
             # "MODEL_S3_KEY":"s3://rp-gw-1/dkn_model/dkn-2020-12-03-11-53-53-391/output/model.tar.gz"
