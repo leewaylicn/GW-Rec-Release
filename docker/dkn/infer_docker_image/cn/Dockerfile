@@ -1,5 +1,6 @@
 ARG REGISTRY_URI
-FROM ${REGISTRY_URI}/tensorflow-inference:1.15.4-gpu-py36-cu100-ubuntu18.04
+FROM ${REGISTRY_URI}/tensorflow-training:1.15.3-cpu-py37-ubuntu18.04
+# tensorflow-inference:1.15.4-gpu-py36-cu100-ubuntu18.04
 
 # FROM tensorflow/serving
 # tensorflow-inference:1.15.4-gpu-py36-cu100-ubuntu18.04

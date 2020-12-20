@@ -1,10 +1,11 @@
 # GW-RecSys
 ## 镜像列表
-| 编号 | 名字 | 内容 | 文件夹 | 完成度 |
+| 编号 | 名字 | 内容 | 文件夹 | 镜像名称|
 | ---- | ---- | ---- | ---- | ---- |
-| 1 | KG 训练 | 知识图谱训练，生成context/entity/word embeddings.npy| graph/train | [x] |
-| 2 | KG 推理 | 知识图谱推理，将单条新闻标题转化为word/entity的索引| graph/inference | [x] |
-| 3 | KG 逻辑 | 知识图谱推理调用，将新闻标题转化为word/entity的索引, 写入缓存| graph/logic | [] |
+| 1 | graph 训练 | 知识图谱训练，生成context/entity/word embeddings.npy| graph/train | gw-graph-train |
+| 2 | graph 推理 | 知识图谱推理，将单条新闻标题转化为word/entity的索引| graph/inference | gw-graph-infer |
+| 3 | dkn 训练 | 知识图谱推理，将单条新闻标题转化为word/entity的索引| graph/inference | gw-dkn-train |
+| 4 | dkn 推理| 知识图谱推理调用，将新闻标题转化为word/entity的索引, 写入缓存| graph/logic | gw-dkn-infer|
 
 ## 使用方法
 #### KG 训练

@@ -31,5 +31,4 @@ aws ecr get-login-password --region ${region} | docker login --username AWS --pa
 # 判断自己的账户下有没有相应的repo
 aws ecr describe-repositories --repository-names $repo_name || aws ecr create-repository --repository-name $repo_name
 
-# push repo
 docker push $account_id.dkr.ecr.$region.amazonaws.com.cn/$repo_name:${tag}
