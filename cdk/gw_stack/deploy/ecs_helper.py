@@ -181,8 +181,8 @@ class GWEcsHelper:
             )
 
         fargate_service.service.connections.security_groups[0].add_ingress_rule(
-            #peer=ec2.Peer.ipv4(vpc.vpc_cidr_block),
-            peer = ec2.Peer.ipv4('0.0.0.0/0'),
+            peer=ec2.Peer.ipv4(vpc.vpc_cidr_block),
+            # peer = ec2.Peer.ipv4('0.0.0.0/0'),
             connection=ec2.Port.tcp(port),
             description="Allow http inbound from VPC"
         )

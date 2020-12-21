@@ -71,7 +71,7 @@ infer_handler_stack = GWInferHandlerStack(
                         "cdk-stack-infer-handler", 
                         infra_stack.vpc, 
                         ecs_role=infra_stack.ecs_role,
-                        graph_url=graph_stack.url+":8888", 
+                        graph_url=graph_stack.url+":8080", 
                         dkn_url=dkn_stack.url+":8501",
                         redis_host=infra_stack.redis_addr, 
                         redis_port=infra_stack.redis_port
