@@ -13,7 +13,7 @@ class GWInferHandlerStack(core.Stack):
         image = "856419311962.dkr.ecr.cn-northwest-1.amazonaws.com.cn/recsys-graph-dkn-inference:latest"
         # image = "233121040379.dkr.ecr.cn-northwest-1.amazonaws.com.cn/recsys-graph-dkn-inference:latest"
         name = "InferHandler"
-        port = 8080
+        port = 8888
         env = {
             "GRAPH_URL":graph_url,
             "DKN_URL":dkn_url,
