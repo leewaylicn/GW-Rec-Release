@@ -62,6 +62,39 @@ class encoding:
     def __getitem__(self, text):
         seg, ner_gen, ner_indu = self.word_parser(text)
         return self.get_encoding(seg, ner_gen, ner_indu)
+    def get_industry_entities(self, sentence):
+        entities = []
+        i = 0
+        while i < len(sentence):
+            for j in range(i+1, len(sentence)+1):
+                keyword_prefix = self.trie.keys(''.join(sentence[i:j]))
+                if len(keyword_prefix) == 0:
+                    if ''.join(sentence[i:j-1]) in self.trie:
+                        entities.append((i, j-1))
+                    if j-1 == i:
+                        i = j
+                    else:
+                        i = j-1
+                    break
+                if j == len(sentence):
+                    if ''.join(sentence[i:j]) in self.trie:
+                        entities.append((i, j))
+                    i = j
+                    break
+        return entities
+
+    def finditer(self, sub_string, string):
+        last_p = -1
+        while len(string):
+            if sub_string in string:
+                p = string.index(sub_string)
+                string = string[p+1:]
+                p = p + last_p +1
+                last_p = p
+                yield p
+            else:
+                break
+
     def word_parser(self, text):
         seg = [str(word).strip() for word in self.model(text)[0] if len(str(word).strip())!=0]
         ner_pre = self.model(text, target="NER")[0]
@@ -103,26 +136,6 @@ class encoding:
     #                 ner_gen.append((start, end))
     #     ner_indu = self.get_industry_entities(seg)
     #     return seg, ner_gen, ner_indu
-    def get_industry_entities(self, sentence):
-        entities = []
-        i = 0
-        while i < len(sentence):
-            for j in range(i+1, len(sentence)+1):
-                keyword_prefix = self.trie.keys(''.join(sentence[i:j]))
-                if len(keyword_prefix) == 0:
-                    if ''.join(sentence[i:j-1]) in self.trie:
-                        entities.append((i, j-1))
-                    if j-1 == i:
-                        i = j
-                    else:
-                        i = j-1
-                    break
-                if j == len(sentence):
-                    if ''.join(sentence[i:j]) in self.trie:
-                        entities.append((i, j))
-                    i = j
-                    break
-        return entities
     def get_encoding(self, seg, ner_gen, ner_indu):
         max_len = 16
         word_encoding = self.vocab[seg]
