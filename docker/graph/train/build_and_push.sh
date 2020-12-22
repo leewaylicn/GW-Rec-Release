@@ -20,6 +20,10 @@ fi
 # login 到基础镜像的ecr
 aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${registry_uri}
 
+cd container
+chmod +x kggraph/train
+# chmod +x kggraph/serve
+
 # build image
 docker build -t $repo_name . --build-arg REGISTRY_URI=${registry_uri}
 
