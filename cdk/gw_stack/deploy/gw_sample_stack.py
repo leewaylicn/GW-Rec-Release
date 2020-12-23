@@ -10,16 +10,17 @@ class GWSampleStack(core.Stack):
         super().__init__(scope, id, **kwargs)
 
         image = "nginx"
-        name = "sample"
+        name = "Sample"
         port = 80
 
         self.url = GWEcsHelper.create_fagate_ALB_autoscaling(
             self,
             vpc,
             image,
-            name#,
-            #port=port
+            name,
+            port=port
         )
 
+        self.redis_addr, self.redis_port = GWRedisHelper.create_redis(self, vpc)
 
 

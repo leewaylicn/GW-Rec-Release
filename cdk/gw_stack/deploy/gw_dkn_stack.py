@@ -26,6 +26,8 @@ class GWDknStack(core.Stack):
             name,
             ecs_role = GWAppHelper.create_ecs_role(self),
             env=env,
-            port=port
+            port=port,
+            desired_count=60,
+            public_load_balancer=True
         )
 

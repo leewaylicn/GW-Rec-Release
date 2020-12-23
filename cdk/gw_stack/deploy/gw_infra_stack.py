@@ -8,20 +8,10 @@ class CdkInfraStack(core.Stack):
     def __init__(self, scope: core.Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
-        # Notice: this is standard VPC process.
         #create vpc https://233121040379.signin.amazonaws.cn/console
-        # subnet_01 = ec2.SubnetConfiguration(name="gwpublic", subnet_type=ec2.SubnetType.PUBLIC, cidr_mask=24)
-        # subnet_02 = ec2.SubnetConfiguration(name="gwprivate", subnet_type=ec2.SubnetType.PRIVATE, cidr_mask=24)
+        #self.vpc = aws_ec2.Vpc(self, 'Vpc', nat_gateways=1)
+        #env={'region': 'cn-northwest-1', 'account': '233121040379'}
 
-        # vpc = ec2.Vpc(self, 
-        #     "myNewVPC", 
-        #     cidr="10.0.0.0/16", 
-        #     subnet_configuration=[subnet_01, subnet_02]
-        # )
-        # self.vpc = aws_ec2.Vpc(self, 'Vpc', nat_gateways=1)
-        #
-
-        # Notice: this for great wisdom test enviroment, for there is a kafka VPC
         self.vpc = aws_ec2.Vpc.from_vpc_attributes(
             self, 
             "VPC",
@@ -35,10 +25,11 @@ class CdkInfraStack(core.Stack):
             private_subnet_route_table_ids=["rtb-03e3e601d120ce62b"]
         )
 
+        #self.vpc = aws_ec2.Vpc.from_lookup(self, "VPC", vpc_id = "vpc-03dd7e12c2b20dc08")
         #core.CfnOutput(self, 'vpcId', value=self.vpc.vpc_id, export_name='ExportedVpcId')
 
         #create redis
-        self.redis_addr, self.redis_port = GWRedisHelper.create_redis(self, self.vpc, is_group=False)
+        self.redis_addr, self.redis_port = GWRedisHelper.create_redis(self, self.vpc)
 
         #create ecs role
         self.ecs_role = GWIAMHelper.create_ecs_role(self)
