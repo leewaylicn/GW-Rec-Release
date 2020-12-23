@@ -6,18 +6,17 @@ from .gw_helper import GWAppHelper
 class GWInferHandlerStack(core.Stack):
 
     def __init__(self, scope: core.Construct, id: str, 
-            vpc: ec2.Vpc, ecs_role: iam.Role, graph_url: str, 
-            dkn_url: str, redis_host: str, redis_port: int, **kwargs) -> None:
+            vpc: ec2.Vpc, ecs_role: iam.Role, graph_url: str, dkn_url: str,redis_host:str,redis_port:str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
                 
         #image = "856419311962.dkr.ecr.cn-north-1.amazonaws.com.cn/recsys-graph-dkn-inference"
-        image = "233121040379.dkr.ecr.cn-northwest-1.amazonaws.com.cn/recsys-graph-dkn-inference:latest"
+        image = "233121040379.dkr.ecr.cn-northwest-1.amazonaws.com.cn/recsys-handler-inference:latest"
         name = "InferHandler"
-        port = 8080
+        port = 9008
         env = {
             "GRAPH_URL":graph_url,
             "DKN_URL":dkn_url,
-            "REDIS_URL":redis_host,
+             "REDIS_URL":redis_host,
             "REDIS_PORT":redis_port
         }
         print(env)
@@ -29,7 +28,9 @@ class GWInferHandlerStack(core.Stack):
             name,
             ecs_role = GWAppHelper.create_ecs_role(self),
             env=env,
-            port=port
+            port=port,
+            public_load_balancer=True,
+            desired_count=10
         )
 
 

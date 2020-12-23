@@ -1,8 +1,7 @@
-FROM python:3.7.9-slim
-RUN pip install boto3
+ARG REGISTRY_URI
+FROM ${REGISTRY_URI}/tensorflow-inference:1.15.4-gpu-py36-cu100-ubuntu18.04
 
-FROM tensorflow/serving
-COPY --from=0 / /
+# COPY --from=0 / /
 
 ADD ./serve_model.py /usr/bin
 RUN mkdir -p /opt/ml/model/dkn

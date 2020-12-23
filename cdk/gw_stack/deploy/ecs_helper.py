@@ -38,13 +38,18 @@ class GWEcsHelper:
     @staticmethod
     def _create_fagate_queue_autoscaling(stack, vpc, image, name, 
             ecs_role=None, env=None, cpu=1024, memory=8192, 
-            public_load_balancer=False):
+            public_load_balancer=False, desired_count=1):
 
         cluster = ecs.Cluster(
             stack, 
             name+'fargate-service-autoscaling', 
             vpc=vpc
         )
+# 20201220 delte
+#         cluster.add_capacity(
+#             name,
+#             instance_type=ec2.InstanceType("c5.large")        
+#         )
 
         ecs_log = ecs.LogDrivers.aws_logs(stream_prefix=name)
 
@@ -79,7 +84,7 @@ class GWEcsHelper:
         ecs.FargateService(stack, name,
             cluster=cluster,
             task_definition=task,
-            desired_count=1
+            desired_count=desired_count
         )
 
         # deploy and run this task once
@@ -109,12 +114,18 @@ class GWEcsHelper:
     @staticmethod
     def _create_fagate_ALB_autoscaling(stack, vpc, image, name, 
             ecs_role=None, env=None, port=None, cpu=1024, memory=8192,
-            public_load_balancer=False):
+            public_load_balancer=False, desired_count=1):
         cluster = ecs.Cluster(
             stack, 
             name+'fargate-service-autoscaling', 
             vpc=vpc
         )
+
+# #         2020-12-17-15注释
+#         cluster.add_capacity(
+#             name,
+#             instance_type=ec2.InstanceType("c5.large")        
+#         )
 
         ecs_log = ecs.LogDrivers.aws_logs(stream_prefix=name)
 
@@ -139,6 +150,7 @@ class GWEcsHelper:
             env = {"test": "test"}
 
         print(env)
+        print({"test":"it is a port service"})
         if port is not None:
             task.add_container(
                 name+'-Contaner',
@@ -169,7 +181,8 @@ class GWEcsHelper:
                 task_definition=task,
                 assign_public_ip=True,
                 public_load_balancer=public_load_balancer,
-                listener_port=port
+                listener_port=port,
+                desired_count=desired_count
             )
         else:
             fargate_service = ecs_patterns.NetworkLoadBalancedFargateService(
@@ -178,7 +191,8 @@ class GWEcsHelper:
                 cluster=cluster,
                 task_definition=task,
                 public_load_balancer=public_load_balancer,
-                assign_public_ip=True
+                assign_public_ip=True,
+                desired_count=desired_count
             )
 
         fargate_service.service.connections.security_groups[0].add_ingress_rule(
@@ -188,13 +202,13 @@ class GWEcsHelper:
         )
 
         # Setup AutoScaling policy
-        scaling = fargate_service.service.auto_scale_task_count(max_capacity=2)
-        scaling.scale_on_cpu_utilization(
-            "CpuScaling",
-            target_utilization_percent=50,
-            scale_in_cooldown=core.Duration.seconds(60),
-            scale_out_cooldown=core.Duration.seconds(60),
-        )
+#         scaling = fargate_service.service.auto_scale_task_count(max_capacity=2)
+#         scaling.scale_on_cpu_utilization(
+#             "CpuScaling",
+#             target_utilization_percent=50,
+#             scale_in_cooldown=core.Duration.seconds(60),
+#             scale_out_cooldown=core.Duration.seconds(60),
+#         )
         '''
         core.CfnOutput(
             stack, 
@@ -207,19 +221,23 @@ class GWEcsHelper:
         return fargate_service.load_balancer.load_balancer_dns_name
 
     @staticmethod
-    def create_fagate_ALB_autoscaling(stack, vpc, image, name, ecs_role=None, env=None, port=None, public_load_balancer=False):
+    def create_fagate_ALB_autoscaling(stack, vpc, image, name, 
+            ecs_role=None, env=None, port=None, 
+            public_load_balancer=False, desired_count=1):
     
         if port is not None:
             url=GWEcsHelper._create_fagate_ALB_autoscaling(stack, vpc, image, name, 
                 ecs_role=ecs_role, 
                 env=env, 
                 port=port,
-                public_load_balancer=public_load_balancer
+                public_load_balancer=public_load_balancer,
+                desired_count=desired_count
             )
         else:
             url=GWEcsHelper._create_fagate_queue_autoscaling(stack, vpc, image, name, 
                 ecs_role=ecs_role, 
-                env=env
+                env=env,
+                desired_count=desired_count
             )
         
         return url

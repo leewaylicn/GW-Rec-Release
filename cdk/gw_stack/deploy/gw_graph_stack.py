@@ -17,14 +17,16 @@ import json
 
 class GWGraphStack(core.Stack):
 
-    def __init__(self, scope: core.Construct, id: str, vpc: ec2.Vpc, **kwargs) -> None:
+    def __init__(self, scope: core.Construct, id: str, vpc: ec2.Vpc,redis_host:str,
+            redis_port:str,  **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
        # vpc = ec2.Vpc(self, "GWVpc", max_azs=3)     # default is all AZs in region
 
         lambda_train_role = GWAppHelper.create_lambda_train_role(self)
-        sagemaker_train_role = GWAppHelper.create_sagemaker_train_role(self)
-
+#         sagemaker_train_role = GWAppHelper.create_sagemaker_train_role(self)
+        self.redis_host=redis_host
+        self.redis_port=redis_port
         cfg_dict = {}
         cfg_dict['vpc'] = vpc
         cfg_dict['name'] = 'graph-train'
@@ -37,9 +39,9 @@ class GWGraphStack(core.Stack):
         cfg_dict['instance'] = "ml.g4dn.xlarge"
         cfg_dict['image_uri'] = '856419311962.dkr.ecr.us-east-1.amazonaws.com/sagemaker-recsys-graph-train'
         cfg_dict['lambda_role'] = lambda_train_role
-        cfg_dict['sagemaker_role'] = sagemaker_train_role
+#         cfg_dict['sagemaker_role'] = sagemaker_train_role
         
-        self.graph_train = GWAppHelper.create_trigger_training_task(self, **cfg_dict)
+#         self.graph_train = GWAppHelper.create_trigger_training_task(self, **cfg_dict)
 
         ## Create Redis
         #self.create_redis(vpc)
@@ -51,7 +53,12 @@ class GWGraphStack(core.Stack):
         cfg_dict['function'] = 'graph_inference'
         cfg_dict['ecr'] = 'sagemaker-recsys-graph-inference'
         cfg_dict['ecs_role'] = GWAppHelper.create_ecs_role(self)
+        
+
         self.graph_inference_dns = self.create_fagate_NLB_autoscaling_custom(vpc, **cfg_dict)
+        
+        
+        
         #cfg_dict = {}
         #cfg_dict['function'] = 'graph_inference'
         #cfg_dict['ecr'] = 'sagemaker-recsys-graph-inference'
@@ -82,8 +89,8 @@ class GWGraphStack(core.Stack):
         cfg_dict['instance'] = "ml.p2.xlarge"
         cfg_dict['image_uri'] = '002224604296.dkr.ecr.us-east-1.amazonaws.com/sagemaker-recsys-dkn-train'
         cfg_dict['lambda_role'] = lambda_train_role
-        cfg_dict['sagemaker_role'] = sagemaker_train_role
-        self.dkn_train = GWAppHelper.create_trigger_training_task(self, **cfg_dict)
+#         cfg_dict['sagemaker_role'] = sagemaker_train_role
+#         self.dkn_train = GWAppHelper.create_trigger_training_task(self, **cfg_dict)
     
 
     def create_redis(self, vpc):
@@ -113,24 +120,24 @@ class GWGraphStack(core.Stack):
             cache_subnet_group_name=subnetGroup.cache_subnet_group_name
         )
         redis.add_depends_on(subnetGroup)
-    
-    def create_fagate_ALB(self, vpc):
-        # Create ECS
-        cluster = ecs.Cluster(self, "GWCluster", vpc=vpc)
+# # 20201221 delete 
+#     def create_fagate_ALB(self, vpc):
+#         # Create ECS
+#         cluster = ecs.Cluster(self, "GWCluster", vpc=vpc)
 
-        ecs_patterns.ApplicationLoadBalancedFargateService(
-            self, 
-            "GWService",
-            cluster=cluster,            # Required
-            cpu=256,                    # Default is 256
-            desired_count=1,            # Default is 1
-            task_image_options=ecs_patterns.ApplicationLoadBalancedTaskImageOptions(
-                image=ecs.ContainerImage.from_registry("856419311962.dkr.ecr.cn-north-1.amazonaws.com.cn/airflow_analyze"),
-                container_port=80
-            ),
-            memory_limit_mib=512,      # Default is 512
-            public_load_balancer=True
-        )
+#         ecs_patterns.ApplicationLoadBalancedFargateService(
+#             self, 
+#             "GWService",
+#             cluster=cluster,            # Required
+#             cpu=256,                    # Default is 256
+#             desired_count=20,            # Default is 1
+#             task_image_options=ecs_patterns.ApplicationLoadBalancedTaskImageOptions(
+#                 image=ecs.ContainerImage.from_registry("856419311962.dkr.ecr.cn-north-1.amazonaws.com.cn/airflow_analyze"),
+#                 container_port=80
+#             ),
+#             memory_limit_mib=512,      # Default is 512
+#             public_load_balancer=True
+#         )
     
     def create_fagate_NLB_autoscaling(self, vpc):
         cluster = ecs.Cluster(
@@ -157,7 +164,7 @@ class GWGraphStack(core.Stack):
 
         port_mapping = ecs.PortMapping(
             container_port=8080,
-            host_port=8080,
+            host_port=8001,
             protocol=ecs.Protocol.TCP
         )
 
@@ -215,7 +222,7 @@ class GWGraphStack(core.Stack):
         fargate_task = ecs.FargateTaskDefinition(
             self, task_name, 
             execution_role=ecs_role, task_role=ecs_role, 
-            cpu=2048, memory_limit_mib=4096
+            cpu=2048, memory_limit_mib=8192
         )
         # 0. config log
         ecs_log = ecs.LogDrivers.aws_logs(stream_prefix=log_name)
@@ -225,12 +232,12 @@ class GWGraphStack(core.Stack):
             container_name,
             image=ecs.ContainerImage.from_ecr_repository(ecr_repo), 
             logging=ecs_log,
-            environment={'KG_PATH':"s3://autorec-1"}
+            environment={'KG_PATH':"s3://autorec-1","REDIS_URL":self.redis_host,"REDIS_PORT":self.redis_port}
         )
         # 2. config port mapping
         port_mapping = ecs.PortMapping(
-            container_port=8080,
-            host_port=8080,
+            container_port=9008,
+            host_port=9008,
             protocol=ecs.Protocol.TCP
         )
         farget_container.add_port_mappings(port_mapping)
@@ -244,25 +251,32 @@ class GWGraphStack(core.Stack):
             self, service_name,
             cluster=cluster,
             task_definition=fargate_task,
-            assign_public_ip=True
+            assign_public_ip=True,
+            desired_count=20,
+            listener_port=9008
         )
         # 0. allow inbound in sg
         fargate_service.service.connections.security_groups[0].add_ingress_rule(
             # peer = ec2.Peer.ipv4(vpc.vpc_cidr_block),
             peer = ec2.Peer.ipv4('0.0.0.0/0'),
-            connection = ec2.Port.tcp(8080),
+            connection = ec2.Port.tcp(9008),
             description = "Allow http inbound from VPC"
         )
+        
+        
         # 1. setup autoscaling policy
-        scaling = fargate_service.service.auto_scale_task_count(
-            max_capacity=2
-        )
-        scaling.scale_on_cpu_utilization(
-            "CpuScaling",
-            target_utilization_percent=50,
-            scale_in_cooldown=core.Duration.seconds(60),
-            scale_out_cooldown=core.Duration.seconds(60),
-        )
+        # autoscaling 自动scale
+#         scaling = fargate_service.service.auto_scale_task_count(
+#             max_capacity=50
+#         )
+#         scaling.scale_on_cpu_utilization(
+#             "CpuScaling",
+#             target_utilization_percent=50,
+#             scale_in_cooldown=core.Duration.seconds(60),
+#             scale_out_cooldown=core.Duration.seconds(60),
+#         )
+
+
 
         return fargate_service.load_balancer.load_balancer_dns_name
 
@@ -303,7 +317,9 @@ class GWGraphStack(core.Stack):
                 'JOB_NAME': job_name,
                 'INSTANCE': instance,
                 'IMAGE_URI': image_uri,
-                'TASK': task
+                'TASK': task,
+                "REDIS_URL":self.redis_host,
+                "REDIS_PORT":self.redis_port
             }
         )
         # Create an S3 event soruce for Lambda
@@ -371,7 +387,9 @@ class GraphInterface(core.Construct):
             code=_lambda.Code.asset('lambda'),
             environment={
                 'GRAPH_TRAIN_DNS': graph_train_dns,
-                'GRAPH_INFERENCE_DNS':graph_inference_dns 
+                'GRAPH_INFERENCE_DNS':graph_inference_dns,
+                "REDIS_URL":self.redis_host,
+                "REDIS_PORT":self.redis_port
             }
         )
 
