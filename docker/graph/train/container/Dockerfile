@@ -1,7 +1,9 @@
 # The tag for the base image is: 10.1-cudnn7-devel-ubuntu16.04
 #FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu16.04
 # FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
-FROM 763104351884.dkr.ecr.us-east-1.amazonaws.com/tensorflow-training:1.15.3-cpu-py37-ubuntu18.04
+# FROM 763104351884.dkr.ecr.us-east-1.amazonaws.com/tensorflow-training:1.15.3-cpu-py37-ubuntu18.04
+ARG REGISTRY_URI
+FROM ${REGISTRY_URI}/tensorflow-training:1.15.3-cpu-py37-ubuntu18.04
 
 #LABEL maintainer="Amazon AI"
 #LABEL dlc_major_version="1"
@@ -37,9 +39,10 @@ FROM 763104351884.dkr.ecr.us-east-1.amazonaws.com/tensorflow-training:1.15.3-cpu
 
 RUN apt-get update
 #RUN apt-get install -y --no-install-recommends software-properties-common && add-apt-repository ppa:deadsnakes/ppa
-RUN apt-get install -y --no-install-recommends nginx curl python3-pip python3-dev \
-&& cd /usr/local/bin && ln -s /usr/bin/python3 python \
+RUN apt-get install -y --no-install-recommends nginx curl \
 && pip3 install --upgrade pip
+# python3-pip python3-dev \
+# && cd /usr/local/bin && ln -s /usr/bin/python3 python \
 
 RUN apt-get install -y --no-install-recommends wget
 RUN apt-get install -y --no-install-recommends ca-certificates

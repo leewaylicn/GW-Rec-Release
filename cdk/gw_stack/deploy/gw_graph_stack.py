@@ -13,52 +13,44 @@ from aws_cdk import (core,
                     )
 
 from .gw_helper import GWAppHelper
+from .ecs_helper import GWEcsHelper
+
 import json
 
 class GWGraphStack(core.Stack):
 
-    def __init__(self, scope: core.Construct, id: str, vpc: ec2.Vpc,redis_host:str,
-            redis_port:str,  **kwargs) -> None:
+    def __init__(self, scope: core.Construct, id: str, vpc: ec2.Vpc, redis_host:str,
+            redis_port:int,  **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
        # vpc = ec2.Vpc(self, "GWVpc", max_azs=3)     # default is all AZs in region
 
-        lambda_train_role = GWAppHelper.create_lambda_train_role(self)
-#         sagemaker_train_role = GWAppHelper.create_sagemaker_train_role(self)
-        self.redis_host=redis_host
-        self.redis_port=redis_port
-        cfg_dict = {}
-        cfg_dict['vpc'] = vpc
-        cfg_dict['name'] = 'graph-train'
-        cfg_dict['date'] = GWAppHelper.get_datetime_str()
-        cfg_dict['trigger_bucket']= "{}-bucket-event-{}".format(cfg_dict['name'], cfg_dict['date'])
-        cfg_dict['input_train_bucket']= "{}-train_bucket".format(cfg_dict['name'])
-        cfg_dict['input_validation_bucket']= "{}-validation-bucket".format(cfg_dict['name'])
-        cfg_dict['output_bucket']= "{}-bucket-model-{}".format(cfg_dict['name'], cfg_dict['date'])
-        cfg_dict['ecr'] = 'sagemaker-recsys-graph-train'
-        cfg_dict['instance'] = "ml.g4dn.xlarge"
-        cfg_dict['image_uri'] = '856419311962.dkr.ecr.us-east-1.amazonaws.com/sagemaker-recsys-graph-train'
-        cfg_dict['lambda_role'] = lambda_train_role
-#         cfg_dict['sagemaker_role'] = sagemaker_train_role
-        
-#         self.graph_train = GWAppHelper.create_trigger_training_task(self, **cfg_dict)
+        graph_infer_image = '233121040379.dkr.ecr.cn-northwest-1.amazonaws.com.cn/sagemaker-recsys-graph-inference:latest'
+        name = "graph-inference"
+        # port = 8080
+        port = 8501
+        env = {
+            # "MODEL_S3_KEY":"s3://rp-gw/dkn/model/model.tar.gz",
+            # "MODEL_S3_KEY":"s3://rp-gw-1/dkn_model/dkn-2020-12-03-11-53-53-391/output/model.tar.gz"
+            "GRAPH_BUCKET": "recommend-gw-1",
+            "KG_DBPEDIA_KEY": "dkn_model/kg_dbpedia.txt",
+            "KG_ENTITY_KEY": "dkn_model/entities_dbpedia.dict",
+            "KG_RELATION_KEY": "dkn_model/relations_dbpedia.dict",
+            "KG_ENTITY_INDUSTRY_KEY": "dkn_model/entity_industry.txt",
+            "KG_VOCAB_KEY": "dkn_model/vocab.json",
+            "DATA_INPUT_KEY": "data/input",
+            "TRAIN_OUTPUT_KEY": "train/output"
+        }
 
-        ## Create Redis
-        #self.create_redis(vpc)
-
-        #Create NLB autoscaling
-        #self.create_fagate_NLB_autoscaling(vpc)
-
-        cfg_dict = {}
-        cfg_dict['function'] = 'graph_inference'
-        cfg_dict['ecr'] = 'sagemaker-recsys-graph-inference'
-        cfg_dict['ecs_role'] = GWAppHelper.create_ecs_role(self)
-        
-
-        self.graph_inference_dns = self.create_fagate_NLB_autoscaling_custom(vpc, **cfg_dict)
-        
-        
-        
+        self.url = GWEcsHelper.create_fagate_ALB_autoscaling(
+            self,
+            vpc,
+            graph_infer_image,
+            name,
+            ecs_role = GWAppHelper.create_ecs_role(self),
+            env=env,
+            port=port
+        )
         #cfg_dict = {}
         #cfg_dict['function'] = 'graph_inference'
         #cfg_dict['ecr'] = 'sagemaker-recsys-graph-inference'
@@ -70,29 +62,29 @@ class GWGraphStack(core.Stack):
         #cfg_dict['image_uri'] = '002224604296.dkr.ecr.us-east-1.amazonaws.com/sagemaker-recsys-graph-train'
         #self.create_lambda_trigger_task_custom(vpc, **cfg_dict)
 
-        ####################
-        # test for dkn training
-        cfg_dict['name'] = 'dkn-train'
-        cfg_dict['trigger_bucket']= "{}-bucket-event".format(cfg_dict['name'])
-        #cfg_dict['input_bucket']= "{}-bucket-model-{}".format(cfg_dict['name'], cfg_dict['date'])
-        #cfg_dict['output_bucket']= "{}-bucket-model-{}".format(cfg_dict['name'], cfg_dict['date'])
+        # ####################
+        # # test for dkn training
+        # cfg_dict['name'] = 'dkn-train'
+        # cfg_dict['trigger_bucket']= "{}-bucket-event".format(cfg_dict['name'])
+        # #cfg_dict['input_bucket']= "{}-bucket-model-{}".format(cfg_dict['name'], cfg_dict['date'])
+        # #cfg_dict['output_bucket']= "{}-bucket-model-{}".format(cfg_dict['name'], cfg_dict['date'])
 
-        hyperparameters = {'learning_rate': '0.0001',  'servable_model_die': '/opt/ml/model', 'loss_weight': '1.0', 
-        'use_context': 'True', 'max_click_history': '30',  'num_epochs': '1', 'max_title_length': '16',  'entity_dim': '128', 
-        'word_dim': '300',  'batch_size': '128',  'perform_shuffle': '1', 'checkpointPath': '/opt/ml/checkpoints'}
+        # hyperparameters = {'learning_rate': '0.0001',  'servable_model_die': '/opt/ml/model', 'loss_weight': '1.0', 
+        # 'use_context': 'True', 'max_click_history': '30',  'num_epochs': '1', 'max_title_length': '16',  'entity_dim': '128', 
+        # 'word_dim': '300',  'batch_size': '128',  'perform_shuffle': '1', 'checkpointPath': '/opt/ml/checkpoints'}
 
-        cfg_dict['hparams'] = json.dumps(hyperparameters)
-        cfg_dict['input_train_bucket'] = "autorec-great-wisdom/train.csv/"
-        cfg_dict['input_validation_bucket'] = "autorec-great-wisdom/test.csv/"
-        cfg_dict['output_bucket'] = "autorec-great-wisdom/output_model/"
-        cfg_dict['ecr'] = 'sagemaker-recsys-dkn-train'
-        cfg_dict['instance'] = "ml.p2.xlarge"
-        cfg_dict['image_uri'] = '002224604296.dkr.ecr.us-east-1.amazonaws.com/sagemaker-recsys-dkn-train'
-        cfg_dict['lambda_role'] = lambda_train_role
-#         cfg_dict['sagemaker_role'] = sagemaker_train_role
-#         self.dkn_train = GWAppHelper.create_trigger_training_task(self, **cfg_dict)
+        # cfg_dict['hparams'] = json.dumps(hyperparameters)
+        # cfg_dict['input_train_bucket'] = "autorec-great-wisdom/train.csv/"
+        # cfg_dict['input_validation_bucket'] = "autorec-great-wisdom/test.csv/"
+        # cfg_dict['output_bucket'] = "autorec-great-wisdom/output_model/"
+        # cfg_dict['ecr'] = 'sagemaker-recsys-dkn-train'
+        # cfg_dict['instance'] = "ml.p2.xlarge"
+        # cfg_dict['image_uri'] = '002224604296.dkr.ecr.us-east-1.amazonaws.com/sagemaker-recsys-dkn-train'
+        # cfg_dict['lambda_role'] = lambda_train_role
+        # cfg_dict['sagemaker_role'] = sagemaker_train_role
+        # self.dkn_train = GWAppHelper.create_trigger_training_task(self, **cfg_dict)
     
-
+'''
     def create_redis(self, vpc):
         subnetGroup = ec.CfnSubnetGroup(
             self,
@@ -395,5 +387,5 @@ class GraphInterface(core.Construct):
 
         # self._user_info_table.grant_read_write_data(self.handler)
         # self._item_tag_table.grant_read_write_data(self.handler)
-    
+'''    
 

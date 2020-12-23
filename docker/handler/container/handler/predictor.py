@@ -30,6 +30,8 @@ print("DKN_URL: %s" % dkn_url)
 redis_url = os.environ['REDIS_URL']
 redis_port = int(os.environ['REDIS_PORT'])
 
+r=redis.StrictRedis(host=redis_url,port=redis_port,db=0)
+
 # The flask app for serving predictions
 app = flask.Flask(__name__)
 
@@ -47,7 +49,7 @@ def ping():
                           mimetype='application/json')
 
 
-@app.route('/invocations', methods=['POST'])
+@app.route('/transformation', methods=['POST'])
 def transformation():
     """Do an inference on a single batch of data. In this sample server, we take data as CSV, convert
     it to a pandas data frame for internal use and then convert the predictions back to CSV (which really
@@ -101,7 +103,7 @@ def transformation():
         dict = {}
         dict[data['recall'][0]["id"]] = 1.0
 
-        r = redis.StrictRedis(host=redis_url, port=redis_port, db=0)
+        #r = redis.StrictRedis(host=redis_url, port=redis_port, db=0)
         result = r.zadd(userid, dict)
         print("set to redis ",result)
 
@@ -130,7 +132,7 @@ def transformation():
     #graph_url = 'http://54.87.130.9:8080/invocations'  #history urll ???
     header = {'Content-Type': 'application/json'}
     his_data = {"instance": history}
-    his_res = s.post(graph_url, data=json.dumps(his_data), headers=header, timeout=5)
+    his_res = s.post(graph_url, data=json.dumps(his_data), headers=header, timeout=30)
     print(his_res.text)
 
     #
@@ -152,7 +154,7 @@ def transformation():
         graph_url, 
         data=json.dumps(recall_data), 
         headers=header,
-        timeout=10
+        timeout=30
     )
     print(recall_res.text)
 
@@ -208,7 +210,7 @@ def transformation():
     dkn_res = requests.post(dkn_url, 
         data=json.dumps(dkn_data), 
         headers=header, 
-        timeout=3
+        timeout=30
     )
     print(dkn_res.text)
 
@@ -223,7 +225,156 @@ def transformation():
     #
     # 4.2 set to redis
     # 
-    r=redis.StrictRedis(host=redis_url,port=redis_port,db=0)
+    #r=redis.StrictRedis(host=redis_url,port=redis_port,db=0)
+    result=r.zadd(userid,dict)
+    print("set to redis ",result)
+
+    #
+    # 4.3 repsonse to http caller
+    # 
+    '''
+    response = {"result": result}
+    return flask.Response(response=json.dumps(response), status=200, mimetype='application/json')
+    '''
+
+    results = []
+    tmp = json.loads(dkn_res.text)
+    for i in range(len(data['recall'])):
+        result = {
+            "id": data['recall'][i]["id"],
+            "score": tmp['predictions'][i]
+        }
+        results.append(result)
+    response = {"result": results}
+
+    return flask.Response(response=json.dumps(response), status=200, mimetype='application/json')
+
+
+@app.route('/invocations', methods=['POST'])
+def invocations():
+    """Do an inference on a single batch of data. In this sample server, we take data as CSV, convert
+    it to a pandas data frame for internal use and then convert the predictions back to CSV (which really
+    just means one prediction per line, since there's a single column.
+    """
+    data = None
+
+    # Convert from CSV to pandas
+    if flask.request.content_type == 'application/json':
+        print("raw data is {}".format(flask.request.data))
+        data = flask.request.data.decode('utf-8')
+        print("data is {}".format(data))
+        data = json.loads(data)
+        #data = data['instance']
+        print("final data is {}".format(data))
+    else:
+        return flask.Response(response='This predictor only supports CSV data',
+                              status=415,
+                              mimetype='text/plain')
+
+    # print('Invoked with {} records'.format(data.shape[0]))
+    '''
+    input：
+    {
+        “recall”:[{“id”:1234,”title”:”中国银行”},{“id”:3434,”title”:”中兴进入美国市场”}],
+        “history”:[{“id”:5555,”title”:”中国银行收紧银根”},{“id”:3334,”title”:”股市低迷”}],
+        "userid":1234
+    }
+    output:
+    {
+    “result”:[{“id”:5555,”score”:0.23},{“id”:3334,”score”:0.11}]
+    }
+    '''
+    #
+    # 0.0 init (request session, and set retries to 3
+    #
+    s = requests.Session()
+    s.mount('http://', HTTPAdapter(max_retries=3))
+    s.mount('https://', HTTPAdapter(max_retries=3))
+
+    userid = data['userid']
+
+    #
+    # 0.1 exception process for 1 recall, return by 1 directly
+    #      
+    if len(data['recall']) == 1:
+        dict = {}
+        dict[data['recall'][0]["id"]] = 1.0
+
+        #r = redis.StrictRedis(host=redis_url, port=redis_port, db=0)
+        result = r.zadd(userid, dict)
+        print("set to redis ",result)
+
+        results = []
+        result = {
+            "id": data['recall'][0]["id"],
+            "score": 1
+        }
+        results.append(result)
+
+        response = {"result": results}
+        return flask.Response(response=json.dumps(response), status=200, mimetype='application/json')
+
+    #
+    # 3.1 build click_entities
+    #  
+    history_num = 30
+    title_len = 16
+
+    #input_data = {}
+
+    #input_data['news_words'] = data['recall'][0]['title'][0][0]
+    #input_data['news_entities'] = data['recall'][0]['title'][0][1]
+    click_words = [[0]*title_len for row in range(history_num)]
+    click_entities = [[0]*title_len for row in range(history_num)]
+
+    for cn, hist in enumerate(data['history']):
+        click_words[cn]=list(map(lambda x: x > 10061 and 10061 or x, hist['title'][0][0]))
+        click_entities[cn]=list(map(lambda x: x > 6729 and 6729 or x, hist['title'][0][1]))
+
+    #
+    # 3.3 build full vector with news_words/news_entities/click_words/click_entities
+    #  
+    instances = []
+    for i in data['recall']:
+        news_words=list(map(lambda x: x > 10061 and 10061 or x, i['title'][0][0]))
+        news_entities=list(map(lambda x: x > 6729 and 6729 or x, i['title'][0][1]))
+        #news_words = i[0]
+        #news_entities = i[1]
+        instance = {
+            "news_words": news_words,
+            "news_entities": news_entities,
+            "click_words": click_words,
+            "click_entities": click_entities
+        }
+        instances.append(instance)
+    dkn_data = {"signature_name": "serving_default", "instances": instances}
+    print(dkn_data)
+
+    #
+    # 3.4 build full vector with news_words/news_entities/click_words/click_entities
+    # 
+    #dkn_url='https://api.ireaderm.net/account/charge/info/android' #dkn urll ???
+    header = {'Content-Type': 'application/json'}
+    dkn_res = requests.post(dkn_url, 
+        data=json.dumps(dkn_data), 
+        headers=header, 
+        timeout=30
+    )
+    print(dkn_res.text)
+
+    #
+    # 4.1 process results of dkn
+    # 
+    dict = {}
+    tmp = json.loads(dkn_res.text)
+    for i in range(len(data['recall'])):
+        dict[data['recall'][i]["id"]] = tmp['predictions'][i]
+
+    #
+    # 4.2 set to redis
+    # 
+    #r=redis.StrictRedis(host=redis_url,port=redis_port,db=0)
+    r.delete(userid)
     result=r.zadd(userid,dict)
     print("set to redis ",result)
 

@@ -10,8 +10,11 @@ class GWDknStack(core.Stack):
             vpc: ec2.Vpc, ecs_role: iam.Role,  **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
         
-        #image = "856419311962.dkr.ecr.cn-north-1.amazonaws.com.cn/gw-infer:latest"
-        image = "233121040379.dkr.ecr.cn-northwest-1.amazonaws.com.cn/gw-infer:latest"
+        dkn_infer_image = "233121040379.dkr.ecr.cn-northwest-1.amazonaws.com.cn/gw-dkn-infer:latest"
+        # dkn_train_input = 
+        # dkn_test_input = 
+        # dkn_model_output = 
+        # image = "233121040379.dkr.ecr.cn-northwest-1.amazonaws.com.cn/gw-infer:latest"
         name = "DKN-inference"
         port = 8501
         env = {
@@ -22,7 +25,7 @@ class GWDknStack(core.Stack):
         self.url = GWEcsHelper.create_fagate_ALB_autoscaling(
             self,
             vpc,
-            image,
+            dkn_infer_image,
             name,
             ecs_role = GWAppHelper.create_ecs_role(self),
             env=env,

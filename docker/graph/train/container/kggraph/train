@@ -28,6 +28,15 @@ import sys
 import subprocess
 import traceback
 
+kg_path = os.environ['GRAPH_BUCKET']
+dbpedia_key = os.environ['KG_DBPEDIA_KEY']
+entity_key = os.environ['KG_ENTITY_KEY']
+relation_key = os.environ['KG_RELATION_KEY']
+entity_industry_key = os.environ['KG_ENTITY_INDUSTRY_KEY']
+vocab_key = os.environ['KG_VOCAB_KEY']
+data_input_key = os.environ['DATA_INPUT_KEY']
+train_output_key = os.environ['TRAIN_OUTPUT_KEY']
+
 # These are the paths to where SageMaker mounts interesting things in your container.
 prefix = '/opt/ml/'
 input_path = os.path.join(prefix,'input/data')
@@ -86,8 +95,20 @@ if __name__ == '__main__':
 
         # _run(train_cmd)
 
-        kg = kg.Kg('kg')
-        kg.train(max_step=200)
+        # kg = kg.Kg('kg')
+        # kg = kg.Kg(kg_path, input_bucket_name, output_bucket_name) # Where we keep the model when it's loaded
+        env = {
+            'GRAPH_BUCKET': kg_path,
+            'KG_DBPEDIA_KEY': dbpedia_key,
+            'KG_ENTITY_KEY': entity_key,
+            'KG_RELATION_KEY': relation_key,
+            'KG_ENTITY_INDUSTRY_KEY': entity_industry_key,
+            'KG_VOCAB_KEY': vocab_key,
+            'DATA_INPUT_KEY': data_input_key,
+            'TRAIN_OUTPUT_KEY': train_output_key
+        }
+        graph = kg.Kg(env) # Where we keep the model when it's loaded
+        graph.train(max_step=200)
 
         print('Training complete.')
 

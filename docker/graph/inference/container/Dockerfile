@@ -2,8 +2,8 @@
 # FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu16.04
 # FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
 ARG REGISTRY_URI
-FROM ${REGISTRY_URI}/tensorflow-inference:1.15.4-gpu-py36-cu100-ubuntu18.04
-
+FROM ${REGISTRY_URI}/tensorflow-training:1.15.3-cpu-py37-ubuntu18.04
+# FROM ${REGISTRY_URI}/tensorflow-inference:1.15.4-gpu-py36-cu100-ubuntu18.04
 #LABEL maintainer="Amazon AI"
 #LABEL dlc_major_version="1"
 #
@@ -98,8 +98,11 @@ RUN pip3 install --no-cache-dir gunicorn
 RUN pip3 install --no-cache-dir marisa_trie
 RUN pip3 install --no-cache-dir dgl==0.4.3.post2
 # RUN pip3 install -e git+http://git@github.com/xiaotinghe/fastHan.git'#egg=fastHan'
-# RUN pip3 install -e git+http://git@github.com/xiaotinghe/dgl-ke.git'#egg=dglke&subdirectory=python'
+RUN pip3 install -e git+https://github.com/fastnlp/fastHan.git'#egg=fastHan'
+RUN pip3 install -e git+http://git@github.com/xiaotinghe/dgl-ke.git'#egg=dglke&subdirectory=python'
 RUN pip3 install --no-cache-dir s3fs
+
+RUN pip3 install --no-cache-dir redis
 
 RUN rm -rf /root/.cache
 

@@ -62,11 +62,11 @@ class GWAppHelper:
 
 
 
-    def create_lambda_train_role(self):
+    def create_lambda_train_role(self, name):
         # Config role
         base_role = iam.Role(
             self,
-            "gw_lambda_train_role",
+            "gw_lambda_train_role_{}".format(name),
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com")
         )
         base_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
@@ -75,16 +75,17 @@ class GWAppHelper:
 
         return base_role 
         
-    def create_sagemaker_train_role(self):
+    def create_sagemaker_train_role(self, name):
         # Config role
         base_role = iam.Role(
             self,
-            "gw_sagemaker_train_role",
+            "gw_sagemaker_train_role_{}".format(name),
             assumed_by=iam.ServicePrincipal("sagemaker.amazonaws.com")
         )
         base_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess"))
         base_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("AmazonSageMakerFullAccess"))
-        base_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("AmazonElasticContainerRegistryPublicFullAccess"))
+        #base_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("AmazonElasticContainerRegistryPublicFullAccess"))
+        #base_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("AmazonEC2ContainerRegistryPublicFullAccess"))
         base_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("AmazonEC2ContainerRegistryFullAccess"))
 
         return base_role    

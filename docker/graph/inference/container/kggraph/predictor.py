@@ -12,11 +12,27 @@ import numpy as np
 import flask
 
 import pandas as pd
+import kg
+import encoding
+
+import redis
 
 prefix = '/opt/ml/'
 model_path = os.path.join(prefix, 'model')
 
-kg_path = os.environ['KG_PATH']
+kg_path = os.environ['GRAPH_BUCKET']
+dbpedia_key = os.environ['KG_DBPEDIA_KEY']
+entity_key = os.environ['KG_ENTITY_KEY']
+relation_key = os.environ['KG_RELATION_KEY']
+entity_industry_key = os.environ['KG_ENTITY_INDUSTRY_KEY']
+vocab_key = os.environ['KG_VOCAB_KEY']
+data_input_key = os.environ['DATA_INPUT_KEY']
+train_output_key = os.environ['TRAIN_OUTPUT_KEY']
+redis_url = os.environ['REDIS_URL']
+redis_port = int(os.environ['REDIS_PORT'])
+print(kg_path)
+print(redis_url)
+print(redis_port)
 
 # graph = kg.Kg('kg')
 # model = encoding.encoding(graph)
@@ -25,10 +41,19 @@ kg_path = os.environ['KG_PATH']
 # It has a predict function that does a prediction based on the model and the input data.
 
 class ScoringService(object):
-    import kg
-    import encoding
-    graph = kg.Kg(kg_folder=kg_path) # Where we keep the model when it's loaded
-    model = encoding.encoding(graph)
+    env = {
+        'GRAPH_BUCKET': kg_path,
+        'KG_DBPEDIA_KEY': dbpedia_key,
+        'KG_ENTITY_KEY': entity_key,
+        'KG_RELATION_KEY': relation_key,
+        'KG_ENTITY_INDUSTRY_KEY': entity_industry_key,
+        'KG_VOCAB_KEY': vocab_key,
+        'DATA_INPUT_KEY': data_input_key,
+        'TRAIN_OUTPUT_KEY': train_output_key
+    }
+
+    graph = kg.Kg(env) # Where we keep the model when it's loaded
+    model = encoding.encoding(graph, env)
 
     @classmethod
     def get_model(cls):
@@ -64,8 +89,8 @@ def ping():
     status = 200
     return flask.Response(response='\n', status=status, mimetype='application/json')
 
-@app.route('/invocations', methods=['POST'])
-def transformation():
+@app.route('/batch', methods=['POST'])
+def batch():
     """Do an inference on a single batch of data. In this sample server, we take data as CSV, convert
     it to a pandas data frame for internal use and then convert the predictions back to CSV (which really
     just means one prediction per line, since there's a single column.
@@ -99,6 +124,40 @@ def transformation():
     #out = StringIO.StringIO()
     #pd.DataFrame({'results':predictions}).to_csv(out, header=False, index=False)
     #result = out.getvalue()
+    rr = json.dumps({'result': np.asarray(predictions).tolist()})
+    print("bytes prediction is {}".format(rr))
+
+    return flask.Response(response=rr, status=200, mimetype='application/json')
+
+@app.route('/invocations', methods=['POST'])
+def invocations():
+    """Do an inference on a single batch of data. In this sample server, we take data as CSV, convert
+    it to a pandas data frame for internal use and then convert the predictions back to CSV (which really
+    just means one prediction per line, since there's a single column.
+    """
+    data = None
+
+    # Convert from CSV to pandas
+    if flask.request.content_type == 'application/json':
+        print("raw data is {}".format(flask.request.data))
+        data = flask.request.data.decode('utf-8')
+        print("data is {}".format(data))
+        data = json.loads(data)
+        title = data['title']#.encode('utf-8')
+        userid = data['id']
+        print("final data is {}".format(data))
+    else:
+        return flask.Response(response='This predictor only supports CSV data', status=415, mimetype='text/plain')
+
+    # Do the prediction
+    predictions=[]
+    predictions.append(ScoringService.predict(title))
+    print(predictions)
+    print(json.dumps(np.asarray(predictions).tolist()))
+
+    r=redis.StrictRedis(host=redis_url,port=redis_port,db=0)
+    result=r.set(userid, json.dumps(np.asarray(predictions).tolist()), ex=86400*30)    
+
     rr = json.dumps({'result': np.asarray(predictions).tolist()})
     print("bytes prediction is {}".format(rr))
 

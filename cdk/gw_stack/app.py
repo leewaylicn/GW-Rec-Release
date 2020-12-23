@@ -16,6 +16,8 @@ from deploy.stocks_cache import Stickscache
 from deploy.resultapi import Resultapi
 from deploy.gw_ec2_stack import GWec2Stack
 from deploy.gw_apscheduler_stack  import GWApschedulerStack
+from deploy.gw_graph_train_stack  import GWGraphTrainStack
+from deploy.gw_dkn_train_stack import GWDknTrainStack
 
 # from deploy.gw_trainhandler_stack import GWTrainHandlerStack
 
@@ -90,7 +92,7 @@ infer_handler_stack = GWInferHandlerStack(
                         "cdk-stack-infer-handler", 
                         infra_stack.vpc, 
                         ecs_role=infra_stack.ecs_role,
-                        graph_url=graph_stack.graph_inference_dns+":9008", 
+                        graph_url=graph_stack.url+":9008", 
                         dkn_url=dkn_stack.url+":8501",
                         redis_host=redis_host, 
                         redis_port=redis_port
@@ -159,6 +161,21 @@ gw_apscheduler_stack = GWApschedulerStack(
                         ecs_role=infra_stack.ecs_role,
                         redis_host=redis_host,
                         redis_port=redis_port
+                    )
+
+
+############################Deploy training job##################
+gw_graph_train_stack = GWGraphTrainStack(
+                        app,
+                        "cdk-stack-train-graph",
+                        infra_stack.vpc
+                    )
+
+gw_dkn_train_stack = GWDknTrainStack(
+                        app,
+                        "cdk-stack-train-dkn",
+                        infra_stack.vpc,
+                        ecs_role=infra_stack.ecs_role
                     )
 
 app.synth()

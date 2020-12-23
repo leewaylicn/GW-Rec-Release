@@ -2,23 +2,41 @@ import boto3
 import numpy as np
 import json
 import re
+import os
 import sys
 print("sys path is {}".format(sys.path))
 from fastHan import FastHan
 import marisa_trie
 s3client = boto3.client('s3')
-Bucket = 'autorec-1'
+# Bucket = 'autorec-1'
 
 class Vocab:
-    def __init__(self, vocab_file = None):
+    def __init__(self, Bucket, vocab_key, vocab_file = None):
         self.token_to_idx = {}
+        if not os.path.exists(Bucket):
+            os.makedirs(Bucket)
         if vocab_file == None:
-            s3client.download_file(Bucket, 'vocab.json', 'vocab.json')
-            vocab_file = 'vocab.json'
+            if not os.path.exists(vocab_key):
+                self.check_parent_dir(Bucket, vocab_key)
+                s3client.download_file(Bucket, vocab_key, os.path.join(Bucket, vocab_key))
+            vocab_file = os.path.join(Bucket, vocab_key)
+        # if vocab_file == None:
+        #     s3client.download_file(Bucket, 'vocab.json', 'vocab.json')
+        #     vocab_file = 'vocab.json'
         self.idx_to_token = ['<unk>'] + json.load(open(vocab_file,'r'))
         for i, token in enumerate(self.idx_to_token):
             self.token_to_idx[token] = i
         self.unk = 0
+    def check_parent_dir(self, current_parent, complete_dir):
+        dir_split = complete_dir.split('/')
+        if len(dir_split) == 1:
+            if len(dir_split[0].split('.')) == 1:
+                os.makedirs(os.path.join(current_parent,dir_split[0]))
+            return
+        else:
+            if not os.path.exists(os.path.join(current_parent,dir_split[0])):
+                os.makedirs(os.path.join(current_parent,dir_split[0]))
+            self.check_parent_dir(dir_split[0], '/'.join(dir_split[1:]))
     def __len__(self):
         return len(self.idx_to_token)
 
@@ -33,33 +51,17 @@ class Vocab:
         return [self.idx_to_token[index] for index in indices]
     
 class encoding:
-    def __init__(self, kg):
+    # def __init__(self, kg, input_bucket, output_bucket=None):
+    def __init__(self, kg, env):
         self.kg = kg
+        # self.input_bucket = input_bucket
+        # self.output_bucket = output_bucket
         self.trie = marisa_trie.Trie(list(kg.entity_industry))
-        self.vocab = Vocab()
+        self.vocab = Vocab(env['GRAPH_BUCKET'], env['KG_VOCAB_KEY'])
         self.model=FastHan()
     def __getitem__(self, text):
         seg, ner_gen, ner_indu = self.word_parser(text)
         return self.get_encoding(seg, ner_gen, ner_indu)
-    def word_parser(self, text):
-        seg = [str(word).strip() for word in self.model(text)[0] if len(str(word).strip())!=0]
-        ner_pre = self.model(text, target="NER")[0]
-        ner_gen = []
-        word_pos = [0]
-        for word in seg:
-            word_pos.append(len(word) + word_pos[-1])
-        for n in ner_pre:
-            for j in re.finditer(str(n), ''.join(seg)):
-                start, end = None, None
-                for i in range(len(word_pos)-1):
-                    if j.span()[0] == word_pos[i]:
-                        start = i
-                    if j.span()[1] == word_pos[i+1]:
-                        end = i+1
-                if start!=None and end != None:
-                    ner_gen.append((start, end))
-        ner_indu = self.get_industry_entities(seg)
-        return seg, ner_gen, ner_indu
     def get_industry_entities(self, sentence):
         entities = []
         i = 0
@@ -80,6 +82,60 @@ class encoding:
                     i = j
                     break
         return entities
+
+    def finditer(self, sub_string, string):
+        last_p = -1
+        while len(string):
+            if sub_string in string:
+                p = string.index(sub_string)
+                string = string[p+1:]
+                p = p + last_p +1
+                last_p = p
+                yield p
+            else:
+                break
+
+    def word_parser(self, text):
+        seg = [str(word).strip() for word in self.model(text)[0] if len(str(word).strip())!=0]
+        ner_pre = self.model(text, target="NER")[0]
+        ner_gen = []
+        word_pos = [0]
+        for word in seg:
+            word_pos.append(len(word) + word_pos[-1])
+        for n in ner_pre:
+            n = str(n).replace('*','\*')
+            #print(n)
+#             for j in re.finditer('%r'%n, ''.join(seg)):
+            for j in self.finditer('%r'%n, ''.join(seg)):
+                start, end = None, None
+                for i in range(len(word_pos)-1):
+                    if j.span()[0] == word_pos[i]:
+                        start = i
+                    if j.span()[1] == word_pos[i+1]:
+                        end = i+1
+                if start!=None and end != None:
+                    ner_gen.append((start, end))
+        ner_indu = self.get_industry_entities(seg)
+        return seg, ner_gen, ner_indu
+    # def word_parser(self, text):
+    #     seg = [str(word).strip() for word in self.model(text)[0] if len(str(word).strip())!=0]
+    #     ner_pre = self.model(text, target="NER")[0]
+    #     ner_gen = []
+    #     word_pos = [0]
+    #     for word in seg:
+    #         word_pos.append(len(word) + word_pos[-1])
+    #     for n in ner_pre:
+    #         for j in re.finditer(str(n), ''.join(seg)):
+    #             start, end = None, None
+    #             for i in range(len(word_pos)-1):
+    #                 if j.span()[0] == word_pos[i]:
+    #                     start = i
+    #                 if j.span()[1] == word_pos[i+1]:
+    #                     end = i+1
+    #             if start!=None and end != None:
+    #                 ner_gen.append((start, end))
+    #     ner_indu = self.get_industry_entities(seg)
+    #     return seg, ner_gen, ner_indu
     def get_encoding(self, seg, ner_gen, ner_indu):
         max_len = 16
         word_encoding = self.vocab[seg]
