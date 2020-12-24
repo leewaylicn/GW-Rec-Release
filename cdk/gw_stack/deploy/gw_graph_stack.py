@@ -34,9 +34,10 @@ class GWGraphStack(core.Stack):
         cfg_dict['date'] = GWAppHelper.get_datetime_str()
         cfg_dict['trigger_bucket']= "{}-bucket-event-{}".format(cfg_dict['name'], cfg_dict['date'])
         cfg_dict['input_train_bucket']= "{}-train_bucket".format(cfg_dict['name'])
-        cfg_dict['input_validation_bucket']= "{}-validation-bucket".format(cfg_dict['name'])
+        cfg_dict['input_test_bucket']= "{}-validation-bucket".format(cfg_dict['name'])
         cfg_dict['output_bucket']= "{}-bucket-model-{}".format(cfg_dict['name'], cfg_dict['date'])
         cfg_dict['ecr'] = 'sagemaker-recsys-graph-train'
+        cfg_dict['hparams'] = None
         cfg_dict['instance'] = "ml.g4dn.xlarge"
         cfg_dict['image_uri'] = graph_train_image 
         lambda_train_role = GWAppHelper.create_lambda_train_role(self, cfg_dict['name'])

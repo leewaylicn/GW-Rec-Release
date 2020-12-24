@@ -5,7 +5,7 @@ from iam_helper import IamHelper
 #def create_training_job(bucket, jobname, task, image_uri, instance):
 def create_training_job(**kwargs):
     s3_input_train = "s3://{}".format(kwargs['input_train_bucket'])
-    s3_input_validation = "s3://{}".format(kwargs['input_validation_bucket'])
+    s3_input_validation = "s3://{}".format(kwargs['input_test_bucket'])
     s3_output_path = "s3://{}".format(kwargs['output_bucket'])
     hyperparameters = kwargs['hparams']
     date = kwargs['date']
@@ -19,7 +19,7 @@ def create_training_job(**kwargs):
     partition = IamHelper.get_partition()
     # role_name = "AmazonSageMaker-ExecutionRole-20200512T121482"
     # role_arn = "arn:{}:iam::{}:role/service-role/{}".format(partition, account, role_name)
-    s3_output_path = 's3://sagemaker-{}-{}/'.format(region, account)
+    # s3_output_path = 's3://sagemaker-{}-{}/'.format(region, account)
     image_uri = kwargs['image_uri']
     role_arn = kwargs['sagemaker_role']
     instance = kwargs['instance']

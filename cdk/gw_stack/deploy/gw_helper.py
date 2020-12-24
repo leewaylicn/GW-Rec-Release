@@ -20,8 +20,12 @@ class GWAppHelper:
         image_uri = kwargs['image_uri']
         trigger_bucket = kwargs['trigger_bucket']
         input_train_bucket = kwargs['input_train_bucket']
-        input_validation_bucket = kwargs['input_validation_bucket']
-        #hparams = kwargs['hparams']
+        input_test_bucket = kwargs['input_test_bucket']
+        hparams ='{"params":None}'
+        if kwargs['hparams'] == None:
+            hparams ='{"params":None}'
+        else:
+            hparams = kwargs['hparams']
         output_bucket = kwargs['output_bucket']
         lambda_train_role = kwargs['lambda_role']
         sagemaker_train_role = kwargs['sagemaker_role'].role_arn
@@ -34,12 +38,12 @@ class GWAppHelper:
             role=lambda_train_role,
             environment={
                 'INPUT_TRAIN_BUCKET': input_train_bucket,
-                'INPUT_VALIDATION_BUCKET': input_validation_bucket,
+                'INPUT_TEST_BUCKET': input_test_bucket,
                 'OUTPUT_BUCKET': output_bucket,
                 'NAME': name,
                 'IMAGE_URI': image_uri,
                 'SAGEMAKER_ROLE': sagemaker_train_role,
-                #'HPARAMS': hparams,
+                'HPARAMS': hparams,
                 'INSTANCE': instance
             }
         )

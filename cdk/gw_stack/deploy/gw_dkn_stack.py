@@ -51,7 +51,7 @@ class GWDknStack(core.Stack):
 
         cfg_dict['hparams'] = json.dumps(hyperparameters)
         cfg_dict['input_train_bucket'] = "autorec-great-wisdom/train.csv/"
-        cfg_dict['input_validation_bucket'] = "autorec-great-wisdom/test.csv/"
+        cfg_dict['input_test_bucket'] = "autorec-great-wisdom/test.csv/"
         cfg_dict['output_bucket'] = "autorec-great-wisdom/output_model/"
         cfg_dict['ecr'] = 'sagemaker-recsys-dkn-train'
         cfg_dict['instance'] = "ml.p2.xlarge"
