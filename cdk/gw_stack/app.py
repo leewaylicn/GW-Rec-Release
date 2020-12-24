@@ -17,6 +17,7 @@ from deploy.resultapi import Resultapi
 from deploy.gw_ec2_stack import GWec2Stack
 from deploy.gw_apscheduler_stack  import GWApschedulerStack
 from deploy.gw_graph_train_stack  import GWGraphTrainStack
+from deploy.gw_dashboard_stack import GWDashboardStack
 from deploy.gw_dkn_train_stack import GWDknTrainStack
 
 # from deploy.gw_trainhandler_stack import GWTrainHandlerStack
@@ -31,7 +32,12 @@ app = core.App()
 
 #GWGraphStack(app, "gw-graph-stack")
 # GWTrainHandlerStack(app, "gw-train-stack")
-
+StackNames={
+    'ec2Stack':[],
+    'lambdaStack':[],
+    'elbStack':[],
+    'redisStack':[],
+}
 infra_stack = CdkInfraStack(
                 app, 
                 "cdk-stack-infer-infra"
@@ -52,7 +58,7 @@ ec2_stack = GWec2Stack(
                 ec2_type="t2.micro",
                 keyName="eccom-test"
             )
-
+StackNames['ec2Stack']=ec2_stack.instanceids
 sample_stack = GWSampleStack(
                 app, 
                 "cdk-stack-infer-Sample", 
@@ -66,7 +72,7 @@ dkn_stack = GWDknStack(
             infra_stack.vpc,
             ecs_role=infra_stack.ecs_role,
         )
-#
+StackNames['elbStack'].append('cdk-stack-infer-dkn')
 graph_stack = GWGraphStack(
                 app,
                 "cdk-stack-infer-graph",
@@ -75,7 +81,7 @@ graph_stack = GWGraphStack(
                 redis_port=redis_port
                 #ecs_role = infra_stack.ecs_role
             )
-
+StackNames['elbStack'].append('cdk-stack-infer-graph')
 # infer_handler_stack = GWInferHandlerStack(
 #                         app,
 #                         "cdk-stack-infer-handler",
@@ -100,7 +106,7 @@ infer_handler_stack = GWInferHandlerStack(
 
 # handler_url=infer_handler_stack+":8501",
 # AWS_PAIXU_URL
-
+StackNames['elbStack'].append('cdk-stack-infer-handler')
 gw_loginto_stack = GWLogintoStack(
                         app,
                         "cdk-stack-loginto",
@@ -170,7 +176,7 @@ gw_graph_train_stack = GWGraphTrainStack(
                         "cdk-stack-train-graph",
                         infra_stack.vpc
                     )
-
+StackNames['redisStack'].append('redis-gw')
 gw_dkn_train_stack = GWDknTrainStack(
                         app,
                         "cdk-stack-train-dkn",
