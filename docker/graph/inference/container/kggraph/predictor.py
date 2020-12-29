@@ -106,7 +106,7 @@ def transformation():
         print("data is {}".format(data))
         s = StringIO(data)
         print("after StringIO {}".format(s))
-        data = pd.read_csv(s, header=None)
+        data = pd.read_csv(s, header=None, sep='\t')
         print("data frame is {}".format(data))
     else:
         return flask.Response(response='This predictor only supports application/json and text/csv data', status=415, mimetype='text/plain')
@@ -124,12 +124,31 @@ def transformation():
         return flask.Response(response=rr, status=200, mimetype='application/json')
     elif flask.request.content_type == 'text/csv':
         print('Invoked with {} records'.format(data.shape[0]))
+        data_list = data.values.tolist()
 
-        # Do the prediction
-        predictions = ScoringService.predict(data)
+        final_list = []
+        for d in data_list:
+            # Do the prediction
+            predictions = ScoringService.predict(d[2])
+            print("prediction result is {}".format(predictions))
+            word_index = predictions[0]
+            entity_index = predictions[1]
+            result_list.append(d[0])
+            result_list.append(d[1])
+            result_list.append(','.join([str(elem) for elem in word_index]))
+            result_list.append(','.join([str(elem) for elem in entity_index]))
+            final_list.append(result_list)
 
-        # Convert from numpy back to CSV
-        out = StringIO.StringIO()
-        pd.DataFrame({'results':predictions}).to_csv(out, header=False, index=False)
+        out = StringIO()
+        final_array = np.array(final_list)
+        print("array {}".format(final_array))
+        pd_dt = pd.DataFrame(final_array)
+        print("dataframe is {}".format(pd_dt))
+        pd_dt.to_csv(out, header=False, index=False)
         result = out.getvalue()
+        print("result is {}".format(result))
+        # # Convert from numpy back to CSV
+        # out = StringIO.StringIO()
+        # pd.DataFrame({'results':predictions}).to_csv(out, header=False, index=False)
+        # result = out.getvalue()
         return flask.Response(response=result, status=200, mimetype='text/csv')
