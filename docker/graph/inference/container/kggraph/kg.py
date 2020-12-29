@@ -27,13 +27,6 @@ class Kg:
         self.kg_entity_industry_key = env['KG_ENTITY_INDUSTRY_KEY']
         self.data_input_key = env['DATA_INPUT_KEY']
         self.train_output_key = env['TRAIN_OUTPUT_KEY']
-        print("check folders kg_folder {}".format(self.kg_folder))
-        print("check folders kg_dbpedia {}".format(self.kg_dbpedia_key))
-        print("check folders kg_entity {}".format(self.kg_entity_key))
-        print("check folders kg_relation {}".format(self.kg_relation_key))
-        print("check folders kg_entity_industry {}".format(self.kg_entity_industry_key))
-        print("check folders data_input {}".format(self.data_input_key))
-        print("check folders train_output {}".format(self.train_output_key))
     def check_parent_dir(self, current_parent, complete_dir):
         dir_split = complete_dir.split('/')
         if len(dir_split) == 1:

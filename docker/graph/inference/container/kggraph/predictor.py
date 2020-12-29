@@ -104,7 +104,7 @@ def transformation():
         print("batch transform raw data is {}".format(flask.request.data))
         data = flask.request.data.decode('utf-8')
         print("data is {}".format(data))
-        s = StringIO.StringIO(data)
+        s = StringIO(data)
         print("after StringIO {}".format(s))
         data = pd.read_csv(s, header=None)
         print("data frame is {}".format(data))
