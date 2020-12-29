@@ -28,7 +28,7 @@ class Kg:
         self.data_input_key = env['DATA_INPUT_KEY']
         self.train_output_key = env['TRAIN_OUTPUT_KEY']
         print("check folders kg_folder {}".format(self.kg_folder))
-        print("check folders kg_dbpedia {}".format(self.kg_dbpedia))
+        print("check folders kg_dbpedia {}".format(self.kg_dbpedia_key))
         print("check folders kg_entity {}".format(self.kg_entity_key))
         print("check folders kg_relation {}".format(self.kg_relation_key))
         print("check folders kg_entity_industry {}".format(self.kg_entity_industry_key))
