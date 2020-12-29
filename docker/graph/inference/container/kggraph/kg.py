@@ -50,6 +50,7 @@ class Kg:
             os.makedirs(self.kg_folder)
         if not os.path.exists(self.kg_dbpedia_key):
             self.check_parent_dir(self.kg_folder, self.kg_dbpedia_key)
+            print("path is {}".format(os.path.join(self.kg_folder, self.kg_dbpedia_key)))
             s3client.download_file(self.kg_folder, self.kg_dbpedia_key, os.path.join(self.kg_folder ,self.kg_dbpedia_key))
         if not os.path.exists(self.kg_entity_key):
             self.check_parent_dir(self.kg_folder, self.kg_entity_key)
