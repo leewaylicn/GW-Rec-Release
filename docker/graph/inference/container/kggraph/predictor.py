@@ -100,22 +100,36 @@ def transformation():
         #print("test!! recieve text is {}".format(s))
         #data = s
         # data = pd.read_csv(s, header=None)
+    elif flask.request.content_type == 'text/csv':
+        print("batch transform raw data is {}".format(flask.request.data))
+        data = flask.request.data.decode('utf-8')
+        print("data is {}".format(data))
+        s = StringIO.StringIO(data)
+        print("after StringIO {}".format(s))
+        data = pd.read_csv(s, header=None)
+        print("data frame is {}".format(data))
     else:
-        return flask.Response(response='This predictor only supports CSV data', status=415, mimetype='text/plain')
+        return flask.Response(response='This predictor only supports application/json and text/csv data', status=415, mimetype='text/plain')
 
     # print('Invoked with {} records'.format(data.shape[0]))
 
-    # Do the prediction
-    predictions=[]
-    for d in data:
-        predictions.append(ScoringService.predict(data))
-    # print("prediction is {}".format(predictions))
 
-    ## Convert from numpy back to CSV
-    #out = StringIO.StringIO()
-    #pd.DataFrame({'results':predictions}).to_csv(out, header=False, index=False)
-    #result = out.getvalue()
-    rr = json.dumps({'result': np.asarray(predictions).tolist()})
-    print("bytes prediction is {}".format(rr))
+    if flask.request.content_type == 'application/json':
+        # Do the prediction
+        predictions=[]
+        for d in data:
+            predictions.append(ScoringService.predict(data))
+        rr = json.dumps({'result': np.asarray(predictions).tolist()})
+        print("bytes prediction is {}".format(rr))
+        return flask.Response(response=rr, status=200, mimetype='application/json')
+    elif flask.request.content_type == 'text/csv':
+        print('Invoked with {} records'.format(data.shape[0]))
 
-    return flask.Response(response=rr, status=200, mimetype='application/json')
+        # Do the prediction
+        predictions = ScoringService.predict(data)
+
+        # Convert from numpy back to CSV
+        out = StringIO.StringIO()
+        pd.DataFrame({'results':predictions}).to_csv(out, header=False, index=False)
+        result = out.getvalue()
+        return flask.Response(response=result, status=200, mimetype='text/csv')
