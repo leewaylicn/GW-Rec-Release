@@ -26,7 +26,6 @@ aws ecr get-login-password --region ${region} | docker login --username AWS --pa
 docker build -t $repo_name . --build-arg REGISTRY_URI=${registry_uri}
 
 # 打tag
-# docker tag $repo_name $account_id.dkr.ecr.$region.amazonaws.com.cn/$repo_name:${tag}
 docker tag $repo_name $account_uri/$repo_name:${tag}
 
 # login 到自己的ecr
@@ -35,5 +34,4 @@ aws ecr get-login-password --region ${region} | docker login --username AWS --pa
 aws ecr describe-repositories --repository-names $repo_name || aws ecr create-repository --repository-name $repo_name
 
 # push repo
-# docker push $account_id.dkr.ecr.$region.amazonaws.com.cn/$repo_name:${tag}
 docker push $account_uri/$repo_name:${tag}
