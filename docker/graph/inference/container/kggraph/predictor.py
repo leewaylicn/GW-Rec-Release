@@ -129,6 +129,7 @@ def transformation():
         final_list = []
         for d in data_list:
             # Do the prediction
+            result_list = []
             predictions = ScoringService.predict(d[2])
             print("prediction result is {}".format(predictions))
             word_index = predictions[0]
