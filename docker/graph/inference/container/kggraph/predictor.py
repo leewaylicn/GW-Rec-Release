@@ -158,11 +158,12 @@ def invocations():
     print(predictions)
     print(json.dumps(np.asarray(predictions).tolist()))
 
-    def get_redis_client(redis_type='single', host='127.0.0.1', port=6379, db=0, pwd=None, nodes=None, timeout=3):
+    def get_redis_client(redis_type='single', host='127.0.0.1', port=6379, db=0, pwd=None, timeout=3):
         if redis_type == 'single':
             pool = redis.ConnectionPool(host=host, port=port, db=db, password=pwd, socket_timeout=timeout, socket_connect_timeout=timeout, encoding='utf-8', decode_responses=True)
             client = redis.StrictRedis(connection_pool=pool)
         else:
+            nodes = [{ "host": host, "port": str(port)}]
             client = rediscluster.StrictRedisCluster(startup_nodes=nodes, decode_responses=True, socket_timeout=timeout, socket_connect_timeout=timeout)
         return client
 
