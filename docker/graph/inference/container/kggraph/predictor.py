@@ -16,6 +16,7 @@ import kg
 import encoding
 
 import redis
+import rediscluster
 
 prefix = '/opt/ml/'
 model_path = os.path.join(prefix, 'model')
@@ -75,6 +76,8 @@ class ScoringService(object):
                 one prediction per row in the dataframe"""
         clf = cls.get_model()
         return clf[input]
+
+
 
 # The flask app for serving predictions
 app = flask.Flask(__name__)
@@ -155,7 +158,17 @@ def invocations():
     print(predictions)
     print(json.dumps(np.asarray(predictions).tolist()))
 
-    r=redis.StrictRedis(host=redis_url,port=redis_port,db=0)
+    def get_redis_client(redis_type='single', host='127.0.0.1', port=6379, db=0, pwd=None, nodes=None, timeout=3):
+        if redis_type == 'single':
+            pool = redis.ConnectionPool(host=host, port=port, db=db, password=pwd, socket_timeout=timeout, socket_connect_timeout=timeout, encoding='utf-8', decode_responses=True)
+            client = redis.StrictRedis(connection_pool=pool)
+        else:
+            client = rediscluster.StrictRedisCluster(startup_nodes=nodes, decode_responses=True, socket_timeout=timeout, socket_connect_timeout=timeout)
+        return client
+
+    r=get_redis_client(redis_type='cluster',host=redis_url,port=redis_port,db=0)
+    #r=redis.StrictRedis(host=redis_url,port=redis_port,db=0)
+
     result=r.set(userid, json.dumps(np.asarray(predictions).tolist()), ex=86400*30)    
 
     rr = json.dumps({'result': np.asarray(predictions).tolist()})

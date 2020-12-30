@@ -103,6 +103,7 @@ RUN pip3 install -e git+http://git@github.com/xiaotinghe/dgl-ke.git'#egg=dglke&s
 RUN pip3 install --no-cache-dir s3fs
 
 RUN pip3 install --no-cache-dir redis
+RUN pip3 install --no-cache-dir redis-py-cluster
 
 RUN rm -rf /root/.cache
 
