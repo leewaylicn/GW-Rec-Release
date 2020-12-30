@@ -163,8 +163,8 @@ def invocations():
             pool = redis.ConnectionPool(host=host, port=port, db=db, password=pwd, socket_timeout=timeout, socket_connect_timeout=timeout, encoding='utf-8', decode_responses=True)
             client = redis.StrictRedis(connection_pool=pool)
         else:
-            nodes = [{ "host": host, "port": str(port)}]
-            client = rediscluster.StrictRedisCluster(startup_nodes=nodes, decode_responses=True, socket_timeout=timeout, socket_connect_timeout=timeout)
+            nodes = [{ "host": host, "port": port}]
+            client = rediscluster.RedisCluster(startup_nodes=nodes, decode_responses=True, socket_timeout=timeout, socket_connect_timeout=timeout)
         return client
 
     r=get_redis_client(redis_type='cluster',host=redis_url,port=redis_port,db=0)

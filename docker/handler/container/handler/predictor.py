@@ -37,7 +37,7 @@ def get_redis_client(redis_type='single', host='127.0.0.1', port=6379, db=0, pwd
         client = redis.StrictRedis(connection_pool=pool)
     else:
         nodes = [{ "host": host, "port": port}]
-        client = rediscluster.StrictRedisCluster(startup_nodes=nodes, decode_responses=True, socket_timeout=timeout, socket_connect_timeout=timeout)
+        client = rediscluster.RedisCluster(startup_nodes=nodes, decode_responses=True, socket_timeout=timeout, socket_connect_timeout=timeout)
     return client
 r=redis.get_redis_client(redis_type='cluster', host=redis_url, port=redis_port, db=0)
 
