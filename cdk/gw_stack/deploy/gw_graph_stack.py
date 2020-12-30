@@ -29,32 +29,25 @@ class GWGraphStack(core.Stack):
         name = "graph-inference"
         # port = 8080
         port = 8501
-        env = {
-            # "MODEL_S3_KEY":"s3://rp-gw/dkn/model/model.tar.gz",
-            # "MODEL_S3_KEY":"s3://rp-gw-1/dkn_model/dkn-2020-12-03-11-53-53-391/output/model.tar.gz"
-            "GRAPH_BUCKET": "recommend-gw-1",
-            "KG_DBPEDIA_KEY": "dkn_model/kg_dbpedia.txt",
-            "KG_ENTITY_KEY": "dkn_model/entities_dbpedia.dict",
-            "KG_RELATION_KEY": "dkn_model/relations_dbpedia.dict",
-            "KG_ENTITY_INDUSTRY_KEY": "dkn_model/entity_industry.txt",
-            "KG_VOCAB_KEY": "dkn_model/vocab.json",
-            "DATA_INPUT_KEY": "data/input",
-            "TRAIN_OUTPUT_KEY": "train/output"
-        }
 
-        self.url = GWEcsHelper.create_fagate_ALB_autoscaling(
-            self,
-            vpc,
-            graph_infer_image,
-            name,
-            ecs_role = GWAppHelper.create_ecs_role(self),
-            env=env,
-            port=port
-        )
-        #cfg_dict = {}
-        #cfg_dict['function'] = 'graph_inference'
-        #cfg_dict['ecr'] = 'sagemaker-recsys-graph-inference'
-        #graph_inference_dns = self.create_fagate_NLB_autoscaling_custom(vpc, **cfg_dict)
+        # cfg_dict = {}
+        # cfg_dict['function'] = 'graph_inference'
+        # cfg_dict['ecr'] = 'sagemaker-recsys-graph-inference'
+
+        # self.url = GWEcsHelper.create_fagate_ALB_autoscaling(
+        #     self,
+        #     vpc,
+        #     graph_infer_image,
+        #     name,
+        #     ecs_role = GWAppHelper.create_ecs_role(self),
+        #     env=env,
+        #     port=port
+        # )
+
+        cfg_dict = {}
+        cfg_dict['function'] = 'graph_inference'
+        cfg_dict['ecr'] = 'sagemaker-recsys-graph-inference'
+        graph_inference_dns = self.create_fagate_NLB_autoscaling_custom(vpc, **cfg_dict)
 
         #cfg_dict['function'] = 'graph_train'
         #cfg_dict['ecr'] = 'sagemaker-recsys-graph-train'
@@ -178,6 +171,7 @@ class GWGraphStack(core.Stack):
         )
 
         return fargate_service.load_balancer.load_balancer_dns_name
+'''
 
     def create_fagate_NLB_autoscaling_custom(self, vpc, **kwargs):
         ####################
@@ -272,6 +266,7 @@ class GWGraphStack(core.Stack):
 
         return fargate_service.load_balancer.load_balancer_dns_name
 
+'''
     def create_lambda_trigger_task_custom(self, vpc, **kwargs):
         ####################
         # Unpack Value
