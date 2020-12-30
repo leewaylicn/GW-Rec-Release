@@ -222,7 +222,7 @@ class GWEcsHelper:
 
     @staticmethod
     def create_fagate_ALB_autoscaling(stack, vpc, image, name, 
-            ecs_role=None, env=None, port=None, 
+            ecs_role=None, env=None, port=None, cpu=1024, memory=8192, 
             public_load_balancer=False, desired_count=1):
     
         if port is not None:
@@ -230,6 +230,8 @@ class GWEcsHelper:
                 ecs_role=ecs_role, 
                 env=env, 
                 port=port,
+                cpu=cpu,
+                memory=memory,
                 public_load_balancer=public_load_balancer,
                 desired_count=desired_count
             )
@@ -237,6 +239,8 @@ class GWEcsHelper:
             url=GWEcsHelper._create_fagate_queue_autoscaling(stack, vpc, image, name, 
                 ecs_role=ecs_role, 
                 env=env,
+                cpu=cpu,
+                memory=memory,
                 desired_count=desired_count
             )
         

@@ -39,7 +39,7 @@ def get_redis_client(redis_type='single', host='127.0.0.1', port=6379, db=0, pwd
         nodes = [{ "host": host, "port": port}]
         client = rediscluster.RedisCluster(startup_nodes=nodes, decode_responses=True, skip_full_coverage_check=True)
     return client
-r=redis.get_redis_client(redis_type='cluster', host=redis_url, port=redis_port, db=0)
+r=get_redis_client(redis_type='cluster', host=redis_url, port=redis_port, db=0)
 
 # The flask app for serving predictions
 app = flask.Flask(__name__)
