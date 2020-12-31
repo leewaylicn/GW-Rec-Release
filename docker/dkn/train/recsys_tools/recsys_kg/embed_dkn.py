@@ -19,7 +19,7 @@ FLAGS = tf.app.flags.FLAGS
 
 # model param
 tf.app.flags.DEFINE_boolean(
-    "transform", True, "whether to transform entity embeddings")
+    "transform", False, "whether to transform entity embeddings")
 tf.app.flags.DEFINE_boolean("use_context", False,
                             "whether to transform context embeddings")
 tf.app.flags.DEFINE_boolean("use_entity", True,

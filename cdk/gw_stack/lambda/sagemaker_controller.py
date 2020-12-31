@@ -39,7 +39,7 @@ def create_training_job(**kwargs):
         "ResourceConfig": {
             "InstanceCount": 1,   
             "InstanceType": instance,
-            "VolumeSizeInGB": 64
+            "VolumeSizeInGB": 500
         },
         "HyperParameters": json.loads(hyperparameters),
         "StoppingCondition": {
@@ -59,7 +59,7 @@ def create_training_job(**kwargs):
                 "CompressionType": "None"
             },
             {
-                "ChannelName": "validation",
+                "ChannelName": "eval",
                 "DataSource": {
                     "S3DataSource": {
                         "S3DataType": "S3Prefix",
