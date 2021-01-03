@@ -114,11 +114,11 @@ class DKN(object):
         self.news_words = feature["news_words"]
         self.news_entities = feature["news_entities"]
         self.labels = labels
-        # print("!!!!!!!!!!verify input shape")
-        # print("!!!!!!!!!!clicked words {}".format(self.clicked_words))
-        # print("!!!!!!!!!!clicked entities {}".format(self.clicked_entities))
-        # print("!!!!!!!!!!news words {}".format(self.news_words))
-        # print("!!!!!!!!!!news entities {}".format(self.news_entities))
+#         print("!!!!!!!!!!verify input shape")
+#         print("!!!!!!!!!!clicked words {}".format(self.clicked_words))
+#         print("!!!!!!!!!!clicked entities {}".format(self.clicked_entities))
+#         print("!!!!!!!!!!news words {}".format(self.news_words))
+#         print("!!!!!!!!!!news entities {}".format(self.news_entities))
     
     def _build_ms_model(self, params):
         with tf.name_scope('embedding'):
@@ -126,18 +126,18 @@ class DKN(object):
                 raw_dir = os.environ.get('SM_CHANNEL_TRAIN')
             else:
                 raw_dir = os.path.join(FLAGS.data_dir, 'train')
-            word_embs = np.load(
-                os.path.join(raw_dir,'word_embeddings_' + str(params["word_dim"]) + '.npy'))
-            entity_embs = np.load(os.path.join(raw_dir,'entity_embeddings_' +
-                                  params["KGE"] + '_' + str(params["entity_dim"]) + '.npy'))
-            # word_embs = np.load(os.path.join(raw_dir, 'word_embeddings.npy'))
-            # entity_embs = np.load(os.path.join(
-            #     raw_dir, 'entity_embeddings.npy'))
-            self.word_embeddings = tf.Variable(
-                word_embs, trainable=False, dtype=np.float32, name='word')
-#             self.word_embeddings = word_embs
-            self.entity_embeddings = tf.Variable(
-                entity_embs, trainable=False, dtype=np.float32, name='entity')
+#             word_embs = np.load(
+#                 os.path.join(raw_dir,'word_embeddings_' + str(params["word_dim"]) + '.npy'))
+#             entity_embs = np.load(os.path.join(raw_dir,'entity_embeddings_' +
+#                                   params["KGE"] + '_' + str(params["entity_dim"]) + '.npy'))
+#             # word_embs = np.load(os.path.join(raw_dir, 'word_embeddings.npy'))
+#             # entity_embs = np.load(os.path.join(
+#             #     raw_dir, 'entity_embeddings.npy'))
+#             self.word_embeddings = tf.Variable(
+#                 word_embs, trainable=False, dtype=np.float32, name='word')
+# #             self.word_embeddings = word_embs
+#             self.entity_embeddings = tf.Variable(
+#                 entity_embs, trainable=False, dtype=np.float32, name='entity')
 #             self.entity_embeddings = entity_embs
 #             self.reg_params.append(self.word_embeddings)
 #             self.reg_params.append(self.entity_embeddings)
@@ -145,11 +145,11 @@ class DKN(object):
 #             print(params["use_context"])
 
             if params["use_context"]:
-#                 print("run here 2.1!")
+                print("run here 2.1!")
                 context_embs = np.load(os.path.join(raw_dir,'context_embeddings_' +
                                       params["KGE"] + '_' + str(params["entity_dim"]) + '.npy'))
                 self.context_embeddings = tf.Variable(
-                    context_embs, dtype=np.float32, name='context')
+                    context_embs, trainable=False, dtype=np.float32, name='context')
 #                 self.reg_params.append(self.context_embeddings)
 #                 print("run here 2.2!")
 
@@ -160,6 +160,7 @@ class DKN(object):
                     kernel_regularizer=tf.contrib.layers.l2_regularizer(params["l2_weight"]))
 #                 print("run here 3.2!")
                 if params["use_context"]:
+                    print("run here transform context")
                     self.context_embeddings = tf.layers.dense(
                         self.context_embeddings, units=params["entity_dim"], activation=tf.nn.tanh,
                         name='transformed_context', kernel_regularizer=tf.contrib.layers.l2_regularizer(params["l2_weight"]))
@@ -174,7 +175,6 @@ class DKN(object):
         self.keep_prob_train = 1 - np.array(params["dropout"])
         self.keep_prob_test = np.ones_like(params["dropout"])
         with tf.compat.v1.variable_scope("DKN") as scope:
-            print("build dkn")
             logit = self._build_dkn()
             return logit
 
@@ -277,8 +277,11 @@ class DKN(object):
         doc_size = params["max_title_length"]
         attention_hidden_sizes = params["attention_layer_sizes"]
 
-        clicked_words = tf.reshape(click_word_batch, shape=[-1, doc_size])
-        clicked_entities = tf.reshape(click_entity_batch, shape=[-1, doc_size])
+#         clicked_words = tf.reshape(click_word_batch, shape=[-1, doc_size])
+#         clicked_entities = tf.reshape(click_entity_batch, shape=[-1, doc_size])
+        
+        clicked_words = click_word_batch
+        clicked_entities = click_entity_batch
 
         with tf.compat.v1.variable_scope(
             "attention_net", initializer=self.initializer
@@ -384,8 +387,8 @@ class DKN(object):
         num_filters = params["n_filters"]
 
         dim = params["word_dim"]
-        embedded_chars = tf.nn.embedding_lookup(self.word_embeddings, word)
-        print(embedded_chars)
+#         embedded_chars = tf.nn.embedding_lookup(self.word_embeddings, word)
+        embedded_chars = word
         if params["use_entity"] and params["use_context"]:
             entity_embedded_chars = tf.nn.embedding_lookup(
                 self.entity_embeddings, entity
@@ -396,11 +399,12 @@ class DKN(object):
             concat = tf.concat(
                 [embedded_chars, entity_embedded_chars, context_embedded_chars], axis=-1
             )
+            print("concat is {}".format(concat))
         elif params["use_entity"]:
-            entity_embedded_chars = tf.nn.embedding_lookup(
-                self.entity_embeddings, entity
-            )
-            print(entity_embedded_chars)
+#             entity_embedded_chars = tf.nn.embedding_lookup(
+#                 self.entity_embeddings, entity
+#             )
+            entity_embedded_chars = entity
             concat = tf.concat([embedded_chars, entity_embedded_chars], axis=-1)
         else:
             concat = embedded_chars
@@ -527,9 +531,16 @@ class DKN(object):
             self.optimizer = tf.compat.v1.train.AdamOptimizer(
                 FLAGS.learning_rate).minimize(self.loss)
 
+def serving_input_receiver_fn()
+
 def input_fn(filenames='', channel='training', batch_size=32, num_epochs=1, perform_shuffle=False):
     # print('Parsing', filenames)
-
+    max_title_length = FLAGS.max_title_length
+    if FLAGS.data_dir == '':
+        raw_dir = os.environ.get('SM_CHANNEL_TRAIN')
+    else:
+        raw_dir = os.path.join(FLAGS.data_dir, 'train')
+     
     def decode_txt(line):
         # print("test line {}".format(line))
         max_click_history = FLAGS.max_click_history
@@ -592,7 +603,6 @@ def input_fn(filenames='', channel='training', batch_size=32, num_epochs=1, perf
 
         feat = {"user_id": user_id, "news_words": ids[0], "news_entities": ids[1],
                 "click_words": click_ids[0], "click_entities": click_ids[1]}
-
         return feat, label
 
     dataset = tf.data.TextLineDataset(filenames)
@@ -615,7 +625,23 @@ def input_fn(filenames='', channel='training', batch_size=32, num_epochs=1, perf
     dataset = dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
     iterator = tf.compat.v1.data.make_one_shot_iterator(dataset)
-    batch_features, batch_labels = iterator.get_next()
+    batch_features_index, batch_labels = iterator.get_next()
+    
+    word_embs = np.load(os.path.join(raw_dir,'word_embeddings_' + str(FLAGS.word_dim) + '.npy'))
+    entity_embs = np.load(os.path.join(raw_dir,raw_dir,'entity_embeddings_' +
+                                      FLAGS.KGE + '_' + str(FLAGS.entity_dim) + '.npy'))
+    context_embs = np.load(os.path.join(raw_dir,raw_dir,'context_embeddings_' +
+                                      FLAGS.KGE + '_' + str(FLAGS.entity_dim) + '.npy'))
+
+    word_embeddings = tf.Variable(word_embs, trainable=False, dtype=np.float32, name='word')
+    entity_embeddings = tf.Variable(entity_embs, trainable=False, dtype=np.float32, name='entity')
+    context_embeddings = tf.Variable(context_embs, trainable=False, dtype=np.float32, name='context')
+    
+    batch_features = {}
+    batch_features['click_words'] = tf.nn.embedding_lookup(word_embeddings, tf.reshape(batch_features_index["click_words"],[-1,max_title_length]))
+    batch_features['click_entities']  = tf.nn.embedding_lookup(entity_embeddings, tf.reshape(batch_features_index["click_entities"],[-1,max_title_length]))
+    batch_features['news_words'] = tf.nn.embedding_lookup(word_embeddings, batch_features_index["news_words"])
+    batch_features['news_entities'] = tf.nn.embedding_lookup(entity_embeddings, batch_features_index["news_entities"])
 
     return batch_features, batch_labels
 
@@ -637,10 +663,8 @@ def model_fn(features, labels, mode, params):
             export_outputs=export_outputs)
 
     # ------bulid loss------
-    print("build train")
     dkn_model._build_train(params)
     loss = dkn_model.loss
-    print("build loss")
     # Provide an estimator spec for `ModeKeys.EVAL`
 #     eval_logging_hook = tf.estimator.LoggingTensorHook(
 #         {'eval_labels': labels, 'eval_pred': pred, 'eval_loss':loss}, every_n_iter=1)
@@ -670,7 +694,6 @@ def model_fn(features, labels, mode, params):
 #     train_logging_hook = tf.estimator.LoggingTensorHook(
 #         {'train_labels': labels, 'train_pred': pred, 'train_loss':loss}, every_n_iter=1)
     
-    print("build train")
     if mode == tf.estimator.ModeKeys.TRAIN:
         return tf.estimator.EstimatorSpec(
             mode=mode,
@@ -768,7 +791,6 @@ def main(_):
         """
         i = 1
         for _ in range(FLAGS.num_epochs):
-            print("start train")
             train_result = dkn_estimator.train(input_fn=lambda: input_fn(
                 tr_files, num_epochs=1, batch_size=FLAGS.batch_size, perform_shuffle=FLAGS.perform_shuffle))
             print("finish train, start eval")
@@ -787,20 +809,20 @@ def main(_):
     if FLAGS.task_type == 'export' or FLAGS.task_type == 'train':
         feature_spec = {
             'click_words': tf.placeholder(
-                dtype=tf.int32, shape=[None, model_params["max_click_history"], model_params["max_title_length"]], name='click_words'),
+                dtype=tf.float32, shape=[None, model_params["max_title_length"], model_params["word_dim"]], name='click_words'),
             'click_entities': tf.placeholder(
-                dtype=tf.int32, shape=[None, model_params["max_click_history"], model_params["max_title_length"]], name='click_entities'),
+                dtype=tf.float32, shape=[None, model_params["max_title_length"], model_params["entity_dim"]], name='click_entities'),
             'news_words': tf.placeholder(
-                dtype=tf.int32, shape=[None, model_params["max_title_length"]], name='news_words'),
+                dtype=tf.float32, shape=[None, model_params["max_title_length"], model_params["word_dim"]], name='news_words'),
             'news_entities': tf.placeholder(
-                dtype=tf.int32, shape=[None, model_params["max_title_length"]], name='news_entities')
+                dtype=tf.float32, shape=[None, model_params["max_title_length"], model_params["entity_dim"]], name='news_entities')
         }
 
-        serving_input_receiver_fn = tf.estimator.export.build_raw_serving_input_receiver_fn(
+        serving_input_receiver_fn_no_embed = tf.estimator.export.build_raw_serving_input_receiver_fn(
             feature_spec)
 
         dkn_estimator.export_savedmodel(FLAGS.servable_model_dir,
-                                        serving_input_receiver_fn)
+                                        serving_input_receiver_fn_no_embed)
         print("finish saving model!")
 
 if __name__ == "__main__":
