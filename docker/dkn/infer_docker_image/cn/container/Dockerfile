@@ -10,7 +10,14 @@ FROM ${REGISTRY_URI}/tensorflow-inference:1.15.4-cpu-py36-ubuntu18.04
 RUN apt-get update
 RUN pip3 install pip -U
 RUN pip3 config set global.index-url https://opentuna.cn/pypi/web/simple
-RUN pip3 install boto3
+RUN pip3 install pandas \
+ && pip3 install numpy \
+ && pip3 install boto3
+
+RUN pip3 install --no-cache-dir flask
+RUN pip3 install --no-cache-dir gevent
+RUN pip3 install --no-cache-dir gunicorn
+RUN pip3 install --no-cache-dir s3fs
 
 # ADD ./serve_model.py /usr/bin
 RUN mkdir -p /opt/ml/model/dkn
