@@ -93,43 +93,43 @@ if not os.path.exists(os.path.join(kg_folder, kg_context_embed_key)):
 class ScoringService(object):
 
     @classmethod
-    def get_model(self):
+    def get_model(cls):
         """Get the model object for this instance, loading it if it's not already loaded."""
-        if self.model == None:
-            # if not os.path.exists(self.kg_folder):
-            #     os.makedirs(self.kg_folder)
-            # if not os.path.exists(os.path.join(self.kg_folder, self.kg_entity_embed_key)):
-            #     self.check_parent_dir('.', os.path.join(
-            #         self.kg_folder, self.kg_entity_embed_key))
-            #     s3client.download_file(self.kg_folder, self.kg_entity_embed_key, os.path.join(
-            #         self.kg_folder, self.kg_entity_embed_key))
-            #     self.entity_embed = np.load(os.path.join(
-            #         self.kg_folder, self.kg_entity_embed_key))
-            # if not os.path.exists(os.path.join(self.kg_folder, self.kg_word_embed_key)):
-            #     self.check_parent_dir('.', os.path.join(
-            #         self.kg_folder, self.kg_word_embed_key))
-            #     s3client.download_file(self.kg_folder, self.kg_word_embed_key, os.path.join(
-            #         self.kg_folder, self.kg_word_embed_key))
-            #     self.word_embed = np.load(os.path.join(
-            #         self.kg_folder, self.kg_word_embed_key))
-            # if not os.path.exists(os.path.join(self.kg_folder, self.kg_context_embed_key)):
-            #     self.check_parent_dir('.', os.path.join(
-            #         self.kg_folder, self.kg_context_embed_key))
-            #     s3client.download_file(self.kg_folder, self.kg_context_embed_key, os.path.join(
-            #         self.kg_folder, self.kg_context_embed_key))
-            #     self.context_embed = np.load(os.path.join(
-            #         self.kg_folder, self.kg_context_embed_key))
+        if cls.model == None:
+            # if not os.path.exists(cls.kg_folder):
+            #     os.makedirs(cls.kg_folder)
+            # if not os.path.exists(os.path.join(cls.kg_folder, cls.kg_entity_embed_key)):
+            #     cls.check_parent_dir('.', os.path.join(
+            #         cls.kg_folder, cls.kg_entity_embed_key))
+            #     s3client.download_file(cls.kg_folder, cls.kg_entity_embed_key, os.path.join(
+            #         cls.kg_folder, cls.kg_entity_embed_key))
+            #     cls.entity_embed = np.load(os.path.join(
+            #         cls.kg_folder, cls.kg_entity_embed_key))
+            # if not os.path.exists(os.path.join(cls.kg_folder, cls.kg_word_embed_key)):
+            #     cls.check_parent_dir('.', os.path.join(
+            #         cls.kg_folder, cls.kg_word_embed_key))
+            #     s3client.download_file(cls.kg_folder, cls.kg_word_embed_key, os.path.join(
+            #         cls.kg_folder, cls.kg_word_embed_key))
+            #     cls.word_embed = np.load(os.path.join(
+            #         cls.kg_folder, cls.kg_word_embed_key))
+            # if not os.path.exists(os.path.join(cls.kg_folder, cls.kg_context_embed_key)):
+            #     cls.check_parent_dir('.', os.path.join(
+            #         cls.kg_folder, cls.kg_context_embed_key))
+            #     s3client.download_file(cls.kg_folder, cls.kg_context_embed_key, os.path.join(
+            #         cls.kg_folder, cls.kg_context_embed_key))
+            #     cls.context_embed = np.load(os.path.join(
+            #         cls.kg_folder, cls.kg_context_embed_key))
             
-            self.model = predictor.from_saved_model('/opt/ml/model/dkn')
+            cls.model = predictor.from_saved_model('/opt/ml/model/dkn')
             print("load model succeed!")
             # with open(os.path.join(model_path, 'decision-tree-model.pkl'), 'r') as inp:
-            #     self.model = pickle.load(inp)
-        return self.model
+            #     cls.model = pickle.load(inp)
+        return cls.model
 
     @classmethod
-    def predict(self, input_data):
+    def predict(cls, input_data):
         """For the input, do the predictions and return them."""
-        model = self.get_model()
+        model = cls.get_model()
         # index = [range(16),range(16)]
         # hist_index = [range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16)]
         # index_np = np.array(index)
@@ -159,7 +159,6 @@ class ScoringService(object):
 
         output = model(input_dict)
         return output
-
 
 # The flask app for serving predictions
 app = flask.Flask(__name__)

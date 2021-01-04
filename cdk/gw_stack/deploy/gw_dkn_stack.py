@@ -21,7 +21,7 @@ class GWDknStack(core.Stack):
         port = 8501
         env = {
             "MODEL_S3_KEY":"s3://rp-gw/dkn/model_complete/model.tar.gz",
-            "GRAPH_BUCKET":"s3://rp-gw",
+            "GRAPH_BUCKET":"rp-gw",
             "KG_WORD_EMBED_KEY":"dkn/embedding/word_embeddings_300.npy",
             "KG_ENTITY_EMBED_KEY":"dkn/embedding/entity_embeddings_TransE_128.npy",
             "KG_CONTEXT_EMBED_KEY":"dkn/embedding/context_embeddings_TransE_128.npy"
