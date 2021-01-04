@@ -31,6 +31,7 @@ RUN pip3 install --no-cache-dir flask
 RUN pip3 install --no-cache-dir gevent
 RUN pip3 install --no-cache-dir gunicorn
 RUN pip3 install --no-cache-dir s3fs
+RUN pip3 install --no-cache-dir glob
 
 # ADD ./serve_model.py /usr/bin
 RUN mkdir -p /opt/ml/model/dkn

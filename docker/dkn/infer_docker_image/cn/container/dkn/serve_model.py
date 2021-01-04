@@ -2,6 +2,7 @@ from __future__ import print_function
 import tarfile
 import os
 import boto3
+import glob
 import sys
 import pandas as pd
 import flask
@@ -120,8 +121,12 @@ class ScoringService(object):
             #         cls.kg_folder, cls.kg_context_embed_key))
             #     cls.context_embed = np.load(os.path.join(
             #         cls.kg_folder, cls.kg_context_embed_key))
+            model_path = None
+            for name in glob.glob(os.path.join(model_dir, '**', 'saved_model.pb'), recursive=True):
+                print("found model saved_model.pb in {} !".format(name))
+                model_path = name
             
-            cls.model = predictor.from_saved_model('/opt/ml/model/dkn')
+            cls.model = predictor.from_saved_model(model_path)
             print("load model succeed!")
             # with open(os.path.join(model_path, 'decision-tree-model.pkl'), 'r') as inp:
             #     cls.model = pickle.load(inp)
