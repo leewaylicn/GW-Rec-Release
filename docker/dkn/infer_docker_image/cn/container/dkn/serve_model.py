@@ -124,7 +124,7 @@ class ScoringService(object):
             model_path = None
             for name in glob.glob(os.path.join(model_dir, '**', 'saved_model.pb'), recursive=True):
                 print("found model saved_model.pb in {} !".format(name))
-                model_path = name
+                model_path = '/'.join(name.split('/')[0:-1])
             
             cls.model = predictor.from_saved_model(model_path)
             print("load model succeed!")
