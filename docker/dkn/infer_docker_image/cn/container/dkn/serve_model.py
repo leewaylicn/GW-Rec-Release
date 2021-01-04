@@ -98,29 +98,6 @@ class ScoringService(object):
     def get_model(cls):
         """Get the model object for this instance, loading it if it's not already loaded."""
         if cls.model == None:
-            # if not os.path.exists(cls.kg_folder):
-            #     os.makedirs(cls.kg_folder)
-            # if not os.path.exists(os.path.join(cls.kg_folder, cls.kg_entity_embed_key)):
-            #     cls.check_parent_dir('.', os.path.join(
-            #         cls.kg_folder, cls.kg_entity_embed_key))
-            #     s3client.download_file(cls.kg_folder, cls.kg_entity_embed_key, os.path.join(
-            #         cls.kg_folder, cls.kg_entity_embed_key))
-            #     cls.entity_embed = np.load(os.path.join(
-            #         cls.kg_folder, cls.kg_entity_embed_key))
-            # if not os.path.exists(os.path.join(cls.kg_folder, cls.kg_word_embed_key)):
-            #     cls.check_parent_dir('.', os.path.join(
-            #         cls.kg_folder, cls.kg_word_embed_key))
-            #     s3client.download_file(cls.kg_folder, cls.kg_word_embed_key, os.path.join(
-            #         cls.kg_folder, cls.kg_word_embed_key))
-            #     cls.word_embed = np.load(os.path.join(
-            #         cls.kg_folder, cls.kg_word_embed_key))
-            # if not os.path.exists(os.path.join(cls.kg_folder, cls.kg_context_embed_key)):
-            #     cls.check_parent_dir('.', os.path.join(
-            #         cls.kg_folder, cls.kg_context_embed_key))
-            #     s3client.download_file(cls.kg_folder, cls.kg_context_embed_key, os.path.join(
-            #         cls.kg_folder, cls.kg_context_embed_key))
-            #     cls.context_embed = np.load(os.path.join(
-            #         cls.kg_folder, cls.kg_context_embed_key))
             model_path = None
             for name in glob.glob(os.path.join(model_dir, '**', 'saved_model.pb'), recursive=True):
                 print("found model saved_model.pb in {} !".format(name))
@@ -147,10 +124,16 @@ class ScoringService(object):
         click_entity_index = []
 
         for d in input_data:
+            print("type of d is {}".format(type(d['news_words'])))
+            print("type of d[0] is {}".format(type(d['news_words'][0])))
+            print("type of click d is {}".format(type(d['click_words'])))
+            print("type of click d[0] is {}".format(type(d['click_words'][0])))
+            print("type of click d[0][0] is {}".format(type(d['click_words'][0][0])))
             news_words_index.append(d['news_words'])
             news_entity_index.append(d['news_entities'])
             click_words_index = click_words_index + d['click_words']
             click_entity_index = click_entity_index + d['click_entities']
+        
 
         news_words_index_np = np.array(news_words_index)
         news_entity_index_np = np.array(news_entity_index)
