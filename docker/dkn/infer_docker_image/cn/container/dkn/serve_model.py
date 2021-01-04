@@ -44,47 +44,81 @@ print('extract succeed')
 # # run model
 # print('serving model ...')
 # os.system('tensorflow_model_server --port=8500 --rest_api_port=8501 --model_name=dkn --model_base_path=/opt/ml/model/dkn')
+def check_parent_dir(current_parent, complete_dir):
+    dir_split = complete_dir.split('/')
+    if len(dir_split) == 1:
+        if len(dir_split[0].split('.')) == 1:
+            os.makedirs(os.path.join(current_parent,dir_split[0]))
+        return
+    else:
+        if not os.path.exists(os.path.join(current_parent,dir_split[0])):
+            os.makedirs(os.path.join(current_parent,dir_split[0]))
+        check_parent_dir(os.path.join(current_parent,dir_split[0]), '/'.join(dir_split[1:]))
 
-kg_path = os.environ['GRAPH_BUCKET']
+kg_folder = os.environ['GRAPH_BUCKET']
 kg_entity_embed_key = os.environ['KG_ENTITY_EMBED_KEY']
 kg_word_embed_key = os.environ['KG_WORD_EMBED_KEY']
 kg_context_embed_key = os.environ['KG_CONTEXT_EMBED_KEY']
 
-class ScoringService(object):
-    def __init__(self):
-        self.kg_folder = kg_path
-        self.kg_entity_embed_key = kg_entity_embed_key
-        self.kg_word_embed_key = kg_word_embed_key
-        self.kg_context_embed_key = kg_context_embed_key
+entity_embed = None
+word_embed = None
+context_embed = None
 
+if not os.path.exists(kg_folder):
+    os.makedirs(kg_folder)
+if not os.path.exists(os.path.join(kg_folder, kg_entity_embed_key)):
+    check_parent_dir('.', os.path.join(
+        kg_folder, kg_entity_embed_key))
+    s3client.download_file(kg_folder, kg_entity_embed_key, os.path.join(
+        kg_folder, kg_entity_embed_key))
+    entity_embed = np.load(os.path.join(
+        kg_folder, kg_entity_embed_key))
+    print("downloaded entity_embed")
+if not os.path.exists(os.path.join(kg_folder, kg_word_embed_key)):
+    check_parent_dir('.', os.path.join(
+        kg_folder, kg_word_embed_key))
+    s3client.download_file(kg_folder, kg_word_embed_key, os.path.join(
+        kg_folder, kg_word_embed_key))
+    word_embed = np.load(os.path.join(
+        kg_folder, kg_word_embed_key))
+    print("downloaded word_embed")
+if not os.path.exists(os.path.join(kg_folder, kg_context_embed_key)):
+    check_parent_dir('.', os.path.join(
+        kg_folder, kg_context_embed_key))
+    s3client.download_file(kg_folder, kg_context_embed_key, os.path.join(
+        kg_folder, kg_context_embed_key))
+    context_embed = np.load(os.path.join(
+        kg_folder, kg_context_embed_key))
+    print("downloaded context_embed")
+class ScoringService(object):
 
     @classmethod
     def get_model(self):
         """Get the model object for this instance, loading it if it's not already loaded."""
         if self.model == None:
-            if not os.path.exists(self.kg_folder):
-                os.makedirs(self.kg_folder)
-            if not os.path.exists(os.path.join(self.kg_folder, self.kg_entity_embed_key)):
-                self.check_parent_dir('.', os.path.join(
-                    self.kg_folder, self.kg_entity_embed_key))
-                s3client.download_file(self.kg_folder, self.kg_entity_embed_key, os.path.join(
-                    self.kg_folder, self.kg_entity_embed_key))
-                self.entity_embed = np.load(os.path.join(
-                    self.kg_folder, self.kg_entity_embed_key))
-            if not os.path.exists(os.path.join(self.kg_folder, self.kg_word_embed_key)):
-                self.check_parent_dir('.', os.path.join(
-                    self.kg_folder, self.kg_word_embed_key))
-                s3client.download_file(self.kg_folder, self.kg_word_embed_key, os.path.join(
-                    self.kg_folder, self.kg_word_embed_key))
-                self.word_embed = np.load(os.path.join(
-                    self.kg_folder, self.kg_word_embed_key))
-            if not os.path.exists(os.path.join(self.kg_folder, self.kg_context_embed_key)):
-                self.check_parent_dir('.', os.path.join(
-                    self.kg_folder, self.kg_context_embed_key))
-                s3client.download_file(self.kg_folder, self.kg_context_embed_key, os.path.join(
-                    self.kg_folder, self.kg_context_embed_key))
-                self.context_embed = np.load(os.path.join(
-                    self.kg_folder, self.kg_context_embed_key))
+            # if not os.path.exists(self.kg_folder):
+            #     os.makedirs(self.kg_folder)
+            # if not os.path.exists(os.path.join(self.kg_folder, self.kg_entity_embed_key)):
+            #     self.check_parent_dir('.', os.path.join(
+            #         self.kg_folder, self.kg_entity_embed_key))
+            #     s3client.download_file(self.kg_folder, self.kg_entity_embed_key, os.path.join(
+            #         self.kg_folder, self.kg_entity_embed_key))
+            #     self.entity_embed = np.load(os.path.join(
+            #         self.kg_folder, self.kg_entity_embed_key))
+            # if not os.path.exists(os.path.join(self.kg_folder, self.kg_word_embed_key)):
+            #     self.check_parent_dir('.', os.path.join(
+            #         self.kg_folder, self.kg_word_embed_key))
+            #     s3client.download_file(self.kg_folder, self.kg_word_embed_key, os.path.join(
+            #         self.kg_folder, self.kg_word_embed_key))
+            #     self.word_embed = np.load(os.path.join(
+            #         self.kg_folder, self.kg_word_embed_key))
+            # if not os.path.exists(os.path.join(self.kg_folder, self.kg_context_embed_key)):
+            #     self.check_parent_dir('.', os.path.join(
+            #         self.kg_folder, self.kg_context_embed_key))
+            #     s3client.download_file(self.kg_folder, self.kg_context_embed_key, os.path.join(
+            #         self.kg_folder, self.kg_context_embed_key))
+            #     self.context_embed = np.load(os.path.join(
+            #         self.kg_folder, self.kg_context_embed_key))
             
             self.model = predictor.from_saved_model('/opt/ml/model/dkn')
             print("load model succeed!")
@@ -93,22 +127,36 @@ class ScoringService(object):
         return self.model
 
     @classmethod
-    def predict(self, input):
-        """For the input, do the predictions and return them.
-
-        Args:
-            input (a pandas dataframe): The data on which to do the predictions. There will be
-                one prediction per row in the dataframe"""
-        index = [range(16),range(16)]
-        hist_index = [range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16)]
-        index_np = np.array(index)
-        hist_index_np = np.array(hist_index)
-        input_dict = {}
-        input_dict['click_entities'] = self.entity_embed[hist_index_np]
-        input_dict['click_words'] = self.word_embed[hist_index_np]
-        input_dict['news_entities'] = self.entity_embed[index_np]
-        input_dict['news_words'] = self.word_embed[index_np]
+    def predict(self, input_data):
+        """For the input, do the predictions and return them."""
         model = self.get_model()
+        # index = [range(16),range(16)]
+        # hist_index = [range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16)]
+        # index_np = np.array(index)
+        # hist_index_np = np.array(hist_index)
+
+        news_words_index = []
+        news_entity_index = []
+        click_words_index = []
+        click_entity_index = []
+
+        for d in input_data:
+            news_words_index.append(d['news_words'])
+            news_entity_index.append(d['news_entities'])
+            click_words_index = click_words_index + d['click_words']
+            click_entity_index = click_entity_index + d['click_entities']
+
+        news_words_index_np = np.array(news_words_index)
+        news_entity_index_np = np.array(news_entity_index)
+        click_words_index_np = np.array(click_words_index)
+        click_entity_index_np = np.array(click_entity_index)
+
+        input_dict = {}
+        input_dict['click_entities'] = entity_embed[click_entity_index_np]
+        input_dict['click_words'] = word_embed[click_words_index_np]
+        input_dict['news_entities'] = entity_embed[news_entity_index_np]
+        input_dict['news_words'] = word_embed[news_words_index_np]
+
         output = model(input_dict)
         return output
 
@@ -165,8 +213,9 @@ def transformation():
     if flask.request.content_type == 'application/json':
         # Do the prediction
         predictions = []
-        for d in data:
-            predictions.append(ScoringService.predict(data))
+        # for d in data:
+        #     predictions.append(ScoringService.predict(data))
+        predictions = ScoringService.predict(data)
         rr = json.dumps({'result': np.asarray(predictions).tolist()})
         print("bytes prediction is {}".format(rr))
         return flask.Response(response=rr, status=200, mimetype='application/json')
