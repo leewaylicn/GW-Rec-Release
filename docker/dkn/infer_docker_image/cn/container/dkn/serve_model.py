@@ -156,6 +156,7 @@ class ScoringService(object):
         input_dict['news_words'] = word_embed[news_words_index_np]
 
         output = model(input_dict)
+        print("result is {}".format(output))
         return output
 
 # The flask app for serving predictions
@@ -213,7 +214,7 @@ def transformation():
         # for d in data:
         #     predictions.append(ScoringService.predict(data))
         predictions = ScoringService.predict(data)
-        rr = json.dumps({'result': np.asarray(predictions).tolist()})
+        rr = json.dumps({'result': np.asarray(predictions['prob']).tolist()})
         print("bytes prediction is {}".format(rr))
         return flask.Response(response=rr, status=200, mimetype='application/json')
     elif flask.request.content_type == 'text/csv':
