@@ -24,7 +24,7 @@ aws ecr get-login-password --region ${region} | docker login --username AWS --pa
 
 cd container
 # chmod +x kggraph/train
-chmod +x kggraph/serve
+chmod +x dkn/serve_model.py
 
 # build image
 docker build -t $repo_name . --build-arg REGISTRY_URI=${registry_uri}
