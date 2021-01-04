@@ -137,6 +137,10 @@ class ScoringService(object):
 
         news_words_index_np = np.array(news_words_index)
         news_entity_index_np = np.array(news_entity_index)
+        for idx in news_words_index:
+            print("news words len {} with array {}".format(len(idx), idx))
+        for idx in news_entity_index:
+            print("news entities len {} with array {}".format(len(idx), idx))
         for idx in click_entity_index:
             print("click entity len {} with array {}".format(len(idx), idx))
         for idx in click_words_index:
