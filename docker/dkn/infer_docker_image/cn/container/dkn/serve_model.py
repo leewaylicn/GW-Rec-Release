@@ -3,8 +3,6 @@ import tarfile
 import os
 import boto3
 import sys
-import encoding
-import kg
 import pandas as pd
 import flask
 import numpy as np
