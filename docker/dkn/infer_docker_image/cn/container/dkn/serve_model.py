@@ -47,7 +47,6 @@ print('extract succeed')
 # print('serving model ...')
 # os.system('tensorflow_model_server --port=8500 --rest_api_port=8501 --model_name=dkn --model_base_path=/opt/ml/model/dkn')
 
-
 kg_path = os.environ['GRAPH_BUCKET']
 kg_entity_embed_key = os.environ['KG_ENTITY_EMBED_KEY']
 kg_word_embed_key = os.environ['KG_WORD_EMBED_KEY']
@@ -102,6 +101,10 @@ class ScoringService(object):
         Args:
             input (a pandas dataframe): The data on which to do the predictions. There will be
                 one prediction per row in the dataframe"""
+        index = [range(16),range(16)]
+        hist_index = [range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16)]
+        index_np = np.array(index)
+        hist_index_np = np.array(hist_index)
         input_dict = {}
         input_dict['click_entities'] = self.entity_embed[hist_index_np]
         input_dict['click_words'] = self.word_embed[hist_index_np]
