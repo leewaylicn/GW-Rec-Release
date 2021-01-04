@@ -91,6 +91,7 @@ if not os.path.exists(os.path.join(kg_folder, kg_context_embed_key)):
         kg_folder, kg_context_embed_key))
     print("downloaded context_embed")
 class ScoringService(object):
+    model = None
 
     @classmethod
     def get_model(cls):
