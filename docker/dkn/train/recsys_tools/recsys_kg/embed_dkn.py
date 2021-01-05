@@ -531,8 +531,6 @@ class DKN(object):
             self.optimizer = tf.compat.v1.train.AdamOptimizer(
                 FLAGS.learning_rate).minimize(self.loss)
 
-def serving_input_receiver_fn()
-
 def input_fn(filenames='', channel='training', batch_size=32, num_epochs=1, perform_shuffle=False):
     # print('Parsing', filenames)
     max_title_length = FLAGS.max_title_length
