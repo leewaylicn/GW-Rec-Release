@@ -20,7 +20,7 @@ class GWDknStack(core.Stack):
         name = "DKN-inference"
         port = 8501
         env = {
-            "MODEL_S3_KEY":"s3://rp-gw/dkn/model_complete/model.tar.gz",
+            "MODEL_S3_KEY":"s3://autorec-great-wisdom/output_model/ml-dkn-train-2021-01-05-03-48-47-703/output/model.tar.gz",
             "GRAPH_BUCKET":"rp-gw",
             "KG_WORD_EMBED_KEY":"dkn/embedding/word_embeddings_300.npy",
             "KG_ENTITY_EMBED_KEY":"dkn/embedding/entity_embeddings_TransE_128.npy",

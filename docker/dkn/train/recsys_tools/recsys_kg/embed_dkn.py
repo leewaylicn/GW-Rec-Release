@@ -664,8 +664,8 @@ def model_fn(features, labels, mode, params):
     dkn_model._build_train(params)
     loss = dkn_model.loss
     # Provide an estimator spec for `ModeKeys.EVAL`
-#     eval_logging_hook = tf.estimator.LoggingTensorHook(
-#         {'eval_labels': labels, 'eval_pred': pred, 'eval_loss':loss}, every_n_iter=1)
+    # eval_logging_hook = tf.estimator.LoggingTensorHook(
+    #     {'eval_labels': labels, 'eval_pred': pred, 'eval_loss':loss}, every_n_iter=1)
     # eval_metric_ops = {
     #     "auc": tf.metrics.auc(labels, pred)
     # }
