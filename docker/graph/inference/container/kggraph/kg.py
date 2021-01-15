@@ -20,7 +20,7 @@ class Kg:
             self.load_file()
             # self.load_file(self.kg_folder, self.input_bucket)
     def load_path(self, env):
-        self.kg_folder = env['GRAPH_BUCKET'] 
+        self.kg_folder = env['GRAPH_BUCKET']
         self.kg_dbpedia_key = env['KG_DBPEDIA_KEY'] 
         self.kg_entity_key = env['KG_ENTITY_KEY']
         self.kg_relation_key = env['KG_RELATION_KEY']
@@ -31,11 +31,12 @@ class Kg:
         dir_split = complete_dir.split('/')
         if len(dir_split) == 1:
             if len(dir_split[0].split('.')) == 1:
-                os.makedirs(os.path.join(current_parent,dir_split[0]))
+                os.makedirs(os.path.join(current_parent,dir_split[0]), exist_ok=True)
             return
         else:
             if not os.path.exists(os.path.join(current_parent,dir_split[0])):
-                os.makedirs(os.path.join(current_parent,dir_split[0]))
+                os.makedirs(os.path.join(current_parent,dir_split[0]), exist_ok=True)
+#             print("current {} dir_split[0] {} dir_split[1:0] {}".format(current_parent, dir_split[0], dir_split[1:]))
             self.check_parent_dir(os.path.join(current_parent,dir_split[0]), '/'.join(dir_split[1:]))
     def load_file(self):
         # 加载实体列表
@@ -150,10 +151,10 @@ class Kg:
             for k in self.p:
                 f.write(k)
 #     def train(self, output_dir = 'kg_embedding', hidden_dim=128, max_step=320000):
-    def train(self, output_dir = '/opt/ml/model', hidden_dim=128, max_step=320000):
+    def train(self, output_dir = '/opt/ml/model', hidden_dim=128, max_step=320000, method='RotatE', upload_context=False):
         self.check_parent_dir('.',self.train_output_key)
         dglke_train.main(['--dataset',self.kg_folder,
-                  #'--model_name','RotatE'
+                  '--model_name', method,
                   '--gamma','19.9',
                   '--lr', '0.25',
                   '--max_step',str(max_step),
@@ -189,8 +190,44 @@ class Kg:
         #           '--data_files','entities_dbpedia.dict','relations_dbpedia.dict','kg_dbpedia.txt',
         #           '--neg_sample_size_eval','10000'])
         print("finish training!!")
+        print("start to generate context numpy")
+        generate_entity_name = self.kg_folder+'_'+method+'_entity.npy'
+        generate_context_name = self.kg_folder+'_'+method+'_context.npy'
+        generate_relation_name = self.kg_folder+'_'+method+'_relation.npy'
+        upload_entity_name = "dkn_entity_embedding.npy"
+        upload_context_name = "dkn_context_embeddings.npy"
+        upload_relation_name = "dkn_relation_embedding.npy"
+        kg_embedding = np.load(os.path.join(self.train_output_key, generate_entity_name))
+        context_embeddings = np.zeros([kg_embedding.shape[0], hidden_dim], dtype="float32")
+        entity2neighbor_map = dict()
+        with open(os.path.join(self.kg_folder ,self.kg_dbpedia_key)) as f: # 修改‘kg/kg_dbpedia.txt’文件路径
+            for line in f:
+                line = line.strip().split("\t")
+                head, _, tail = line
+                head = self.idx_to_entity[int(head)] # 修改kg.idx_to_entity
+                tail = self.idx_to_entity[int(tail)]
+                if head in entity2neighbor_map:
+                    entity2neighbor_map[head].append(tail)
+                else:
+                    entity2neighbor_map[head] = [tail]
+                if tail in entity2neighbor_map:
+                    entity2neighbor_map[tail].append(head)
+                else:
+                    entity2neighbor_map[tail] = [head]
+        for entity, index in self.entity_to_idx.items(): # 修改kg.entity_to_idx
+            if entity in entity2neighbor_map:
+                context_full_entities = [self.entity_to_idx[row] for row in entity2neighbor_map[entity]]
+                context_embeddings[index] = np.average(kg_embedding[context_full_entities], axis=0)
+                               
+#         np.save(‘kg_embedding/kg_RotatE_context.npy’, context_embeddings)
+        np.save(os.path.join(self.train_output_key, generate_context_name), context_embeddings)
+                               
         if self.train_output_key != None:
             print("upload to {}".format(self.train_output_key))
-            for name in glob.glob(os.path.join(self.train_output_key, '*.npy')):
-                print("upload {}".format(name))
-                s3client.upload_file(name, self.train_output_key.split('/')[0], name.split('/')[-1])
+            s3client.upload_file(os.path.join(self.train_output_key, generate_entity_name), self.kg_folder, os.path.join(self.train_output_key, upload_entity_name))
+            s3client.upload_file(os.path.join(self.train_output_key, generate_relation_name), self.kg_folder, os.path.join(self.train_output_key, upload_relation_name))
+            if upload_context == True:
+                s3client.upload_file(os.path.join(self.train_output_key, generate_context_name), self.kg_folder, os.path.join(self.train_output_key, upload_context_name))
+#             for name in glob.glob(os.path.join(self.train_output_key,'*.npy')):
+#                 print("upload {}".format(name))
+#                 s3client.upload_file(name, self.kg_folder, os.path.join(self.train_output_key,name.split('/')[-1]))
