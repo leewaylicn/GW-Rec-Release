@@ -113,8 +113,9 @@ class ScoringService(object):
     def predict(cls, input_data):
         """For the input, do the predictions and return them."""
         model = cls.get_model()
-        # index = [range(16),range(16)]
-        # hist_index = [range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16)]
+        print("debug embedding!!!!!!")
+        index = [range(16),range(16)]
+        hist_index = [range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16),range(16)]
         # index_np = np.array(index)
         # hist_index_np = np.array(hist_index)
 
@@ -123,16 +124,21 @@ class ScoringService(object):
         click_words_index = []
         click_entity_index = []
 
-        for d in input_data:
-            print("type of d is {}".format(type(d['news_words'])))
-            print("type of d[0] is {}".format(type(d['news_words'][0])))
-            print("type of click d is {}".format(type(d['click_words'])))
-            print("type of click d[0] is {}".format(type(d['click_words'][0])))
-            print("type of click d[0][0] is {}".format(type(d['click_words'][0][0])))
-            news_words_index.append(d['news_words'])
-            news_entity_index.append(d['news_entities'])
-            click_words_index = click_words_index + d['click_words']
-            click_entity_index = click_entity_index + d['click_entities']
+        # for d in input_data:
+        #     print("type of d is {}".format(type(d['news_words'])))
+        #     print("type of d[0] is {}".format(type(d['news_words'][0])))
+        #     print("type of click d is {}".format(type(d['click_words'])))
+        #     print("type of click d[0] is {}".format(type(d['click_words'][0])))
+        #     print("type of click d[0][0] is {}".format(type(d['click_words'][0][0])))
+        #     news_words_index.append(d['news_words'])
+        #     news_entity_index.append(d['news_entities'])
+        #     click_words_index = click_words_index + d['click_words']
+        #     click_entity_index = click_entity_index + d['click_entities']
+        
+        news_entity_index = index
+        news_entity_index = index
+        click_words_index = hist_index
+        click_entity_index = hist_index
         
 
         news_words_index_np = np.array(news_words_index)
