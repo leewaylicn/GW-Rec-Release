@@ -135,7 +135,7 @@ class ScoringService(object):
         #     click_words_index = click_words_index + d['click_words']
         #     click_entity_index = click_entity_index + d['click_entities']
         
-        news_entity_index = index
+        news_words_index = index
         news_entity_index = index
         click_words_index = hist_index
         click_entity_index = hist_index
