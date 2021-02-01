@@ -124,11 +124,11 @@ class ScoringService(object):
         click_entity_index = []
 
         for d in input_data:
-            # print("type of d is {}".format(type(d['news_words'])))
-            # print("type of d[0] is {}".format(type(d['news_words'][0])))
-            # print("type of click d is {}".format(type(d['click_words'])))
-            # print("type of click d[0] is {}".format(type(d['click_words'][0])))
-            # print("type of click d[0][0] is {}".format(type(d['click_words'][0][0])))
+            print("type of d is {}".format(type(d['news_words'])))
+            print("type of d[0] is {}".format(type(d['news_words'][0])))
+            print("type of click d is {}".format(type(d['click_words'])))
+            print("type of click d[0] is {}".format(type(d['click_words'][0])))
+            print("type of click d[0][0] is {}".format(type(d['click_words'][0][0])))
             news_words_index.append(d['news_words'])
             news_entity_index.append(d['news_entities'])
             click_words_index = click_words_index + d['click_words']
@@ -137,26 +137,26 @@ class ScoringService(object):
 
         news_words_index_np = np.array(news_words_index)
         news_entity_index_np = np.array(news_entity_index)
-        # for idx in news_words_index:
-        #     print("news words len {} with array {}".format(len(idx), idx))
-        # for idx in news_entity_index:
-        #     print("news entities len {} with array {}".format(len(idx), idx))
-        # for idx in click_entity_index:
-        #     print("click entity len {} with array {}".format(len(idx), idx))
-        # for idx in click_words_index:
-        #     print("click word len {} with array {}".format(len(idx), idx))
+        for idx in news_words_index:
+            print("news words len {} with array {}".format(len(idx), idx))
+        for idx in news_entity_index:
+            print("news entities len {} with array {}".format(len(idx), idx))
+        for idx in click_entity_index:
+            print("click entity len {} with array {}".format(len(idx), idx))
+        for idx in click_words_index:
+            print("click word len {} with array {}".format(len(idx), idx))
         click_words_index_np = np.array(click_words_index)
         click_entity_index_np = np.array(click_entity_index)
 
         input_dict = {}
-        # print(click_entity_index_np)
+        print(click_entity_index_np)
         input_dict['click_entities'] = entity_embed[click_entity_index_np]
         input_dict['click_words'] = word_embed[click_words_index_np]
         input_dict['news_entities'] = entity_embed[news_entity_index_np]
         input_dict['news_words'] = word_embed[news_words_index_np]
 
         output = model(input_dict)
-        # print("result is {}".format(output))
+        print("result is {}".format(output))
         return output
 
 # The flask app for serving predictions

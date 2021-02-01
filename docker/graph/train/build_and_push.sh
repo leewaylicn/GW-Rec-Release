@@ -3,7 +3,7 @@
 account_id=`aws sts get-caller-identity --query Account --output text`
 region=$(aws configure get region)
 # repo 相关信息
-repo_name=gw-graph-infer
+repo_name=gw-graph-train
 #tag=`date '+%Y%m%d%H%M%S'`
 tag="latest"
 
